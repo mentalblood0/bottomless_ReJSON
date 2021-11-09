@@ -43,7 +43,6 @@ def test_list():
 	for e in db:
 		# e is RedisInterface instance, 
 		# so to get data you need to call it:
-		print(e.path)
 		assert e() == l[i]
 		assert e() == db[i]
 		i += 1

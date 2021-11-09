@@ -1,10 +1,9 @@
 # ⚿ bottomless_ReJSON 
 
-Library for seamless Redis database management
+Library for seamless Redis database management. This version uses RedisJSON module
 
 <br/>
 
-* ⛓️ Based on pass-through keys yet atomic
 * 💤 No excess data reading/rewriting
 * 👁️ One-class interface
 * 🪄 A lot of sugar
@@ -61,18 +60,21 @@ assert db['1']['1']['1'] == None
 
 ```python
 db.clear()
+db['key'] = []
+db = db['key']
+
 l = [1, 2, 3]
 db += [1, 2, 3]
 
 i = 0
 for e in db:
-    # e is a RedisInterface instance, 
+    # e is RedisInterface instance, 
     # so to get data you need to call it:
     assert e() == l[i]
     assert e() == db[i]
     i += 1
 
-assert list(db) == [1, 2, 3]
+    assert list(db) == [1, 2, 3]
 ```
 
 <br/>
@@ -84,16 +86,3 @@ git clone https://github.com/MentalBlood/bottomless_ReJSON
 cd bottomless_ReJSON
 pytest tests
 ```
-
-<br/>
-
-## 📈 Benchmarking
-
-Currently benchmarks are organized as tests and have been used for performance enhancements (algorithmic optimizations, requests number decreasing)
-
-```bash
-git clone https://github.com/MentalBlood/bottomless_ReJSON
-cd bottomless_ReJSON
-pytest benchmarks
-```
-
