@@ -17,12 +17,6 @@ if __name__ == '__main__':
 		long_description=long_description,
 		long_description_content_type='text/markdown',
 		author='mentalblood',
-		install_requires=[
-			'redis',
-			'flatten-dict'
-		],
-		packages=['bottomless_ReJSON', 'bottomless_ReJSON.scripts'],
-		package_data={
-			'bottomless_ReJSON.scripts': ['*.lua']
-		}
+		install_requires=['rejson'],
+		packages=['bottomless_ReJSON']
 	)
