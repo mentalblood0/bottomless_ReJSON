@@ -19,7 +19,7 @@ def test_append():
 		'e': {'state': 'erroneous'}
 	}
 
-	interface.createIndex('state')
+	interface['sessions'].createIndex('state')
 
 	assert interface['sessions'].filter('state', 'new') == [
 		interface['sessions']['a'],

@@ -1,4 +1,5 @@
 from rejson import Client, Path
+from flatten_dict import flatten
 
 
 
@@ -80,7 +81,9 @@ class RedisInterface:
 					if self[k][field] == value
 				]
 		
-		paths = index[value]
+		paths_dict = index[value]()
+		paths = flatten(paths_dict, enumerate_types=(list,)).keys()
+
 		return [
 			RedisInterface(self.db, p)
 			for p in paths
@@ -89,7 +92,7 @@ class RedisInterface:
 	def createIndex(self, field):
 
 		index = (self.indexes + self)['__index__'][field]
-		index.set([])
+		index.set({})
 
 		for e in self:
 			
@@ -98,8 +101,8 @@ class RedisInterface:
 				continue
 			
 			if not len(index[value]):
-				index[value] = []
-			index[value].append(e.path)
+				index[value] = {}
+			(index[value] + e.path).set(True)
 
 	def set(self, value):
 
@@ -190,7 +193,13 @@ class RedisInterface:
 		return self
 	
 	def __add__(self, other):
-		return RedisInterface(self.db, self.path + other.path, root_key=self.root_key)
+
+		if isinstance(other, RedisInterface):
+			other_path = other.path
+		elif type(other) == list:
+			other_path = other
+
+		return RedisInterface(self.db, self.path + other_path, root_key=self.root_key)
 	
 	def __iter__(self):
 		for k in sorted(self.keys()):
