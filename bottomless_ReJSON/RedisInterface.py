@@ -85,6 +85,21 @@ class RedisInterface:
 			RedisInterface(self.db, p)
 			for p in paths
 		]
+	
+	def createIndex(self, field):
+
+		index = (self.indexes + self)['__index__'][field]
+		index.set([])
+
+		for e in self:
+			
+			value = e[field]()
+			if value == None:
+				continue
+			
+			if not len(index[value]):
+				index[value] = []
+			index[value].append(e.path)
 
 	def set(self, value, pipeline=None):
 

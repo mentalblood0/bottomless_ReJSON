@@ -19,19 +19,7 @@ def test_append():
 		'e': {'state': 'erroneous'}
 	}
 
-	interface.indexes['sessions']['__index__']['state'] = {
-		'new': [
-			['sessions', 'a'],
-			['sessions', 'c']
-		],
-		'processed': [
-			['sessions', 'b'],
-			['sessions', 'd']
-		],
-		'erroneous': [
-			['sessions', 'e']
-		]
-	}
+	interface.createIndex('state')
 
 	assert interface['sessions'].filter('state', 'new') == [
 		interface['sessions']['a'],
