@@ -106,6 +106,30 @@ class RedisInterface:
 		if not len(index[value]):
 			del index[value]
 	
+	def addToIndexes(self, payload):
+
+		if not hasattr(self, 'indexes'):
+			return
+
+		if type(payload) == dict:
+			for k in payload.keys():
+				self[k].addToIndexes(payload[k])
+		else:
+			if self.parent:
+				self.parent.addToIndex(self.path[-1])
+	
+	def removeFromIndexes(self):
+		
+		if not hasattr(self, 'indexes'):
+			return
+		
+		if self.type == 'object':
+			for k in self.keys():
+				self[k].removeFromIndexes()
+		else:
+			if self.parent:
+				self.parent.removeFromIndex(self.path[-1])
+	
 	def createIndex(self, field):
 
 		if self.isIndexExists(field):
@@ -134,30 +158,6 @@ class RedisInterface:
 			self[k]
 			for k in keys
 		]
-	
-	def addToIndexes(self, payload):
-
-		if not hasattr(self, 'indexes'):
-			return
-
-		if type(payload) == dict:
-			for k in payload.keys():
-				self[k].addToIndexes(payload[k])
-		else:
-			if self.parent:
-				self.parent.addToIndex(self.path[-1])
-	
-	def removeFromIndexes(self):
-		
-		if not hasattr(self, 'indexes'):
-			return
-		
-		if self.type == 'object':
-			for k in self.keys():
-				self[k].removeFromIndexes()
-		else:
-			if self.parent:
-				self.parent.removeFromIndex(self.path[-1])
 
 	def set(self, value):
 
