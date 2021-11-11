@@ -80,7 +80,7 @@ class RedisInterface:
 	
 	def addToIndex(self, field):
 
-		if not self.parent.isIndexExists(field):
+		if not self.parent or not self.parent.isIndexExists(field):
 			return False
 
 		index = self.parent.getIndex(field)
@@ -131,6 +131,15 @@ class RedisInterface:
 			self[k]
 			for k in keys
 		]
+	
+	def updateIndexes(self, payload):
+
+		if not hasattr(self, 'indexes'):
+			return
+
+		if type(payload) == dict:
+			for k in payload.keys():
+				self.addToIndex(k)
 
 	def set(self, value):
 
@@ -147,9 +156,11 @@ class RedisInterface:
 					}
 				
 				self.db.jsonset(self.root_key, r._path, value)
+				r.updateIndexes(value)
 				return
 		
 		self.db.jsonset(self.root_key, self._path, value)
+		self.updateIndexes(value)
 
 	def __setitem__(self, key, value):
 
@@ -234,7 +245,7 @@ class RedisInterface:
 			yield self[k]
 
 	def __repr__(self):
-		return f"<{self.__class__.__name__} path=\"{self._composeReJSONPath()}\">"
+		return f"<{self.__class__.__name__} root_key=\"{self.root_key}\" path=\"{self._composeReJSONPath()}\">"
 
 
 import sys
