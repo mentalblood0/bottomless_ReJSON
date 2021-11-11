@@ -82,18 +82,15 @@ class RedisInterface:
 		]
 	
 	def createIndex(self, field):
-
-		index = (self.indexes + self)['__index__'][field]
-
 		for e in self:
-			
-			value = e[field]()
-			if value == None:
-				continue
-			
-			if not len(index[value]):
-				index[value] = {}
-			(index[value] + e.path).set(True)
+			e.addToIndex(field)
+	
+	def addToIndex(self, field):
+
+		index = (self.indexes + self.path[:-1])['__index__'][field]
+
+		value = self[field]()
+		(index[value] + self.path).set(True)
 
 	def set(self, value):
 

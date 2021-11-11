@@ -5,7 +5,7 @@ from bottomless_ReJSON import RedisInterface
 
 
 
-def test_append():
+def test_basic():
 
 	interface = RedisInterface(host=config['db']['host'], port=config['db']['port'])
 	interface.clear()
@@ -20,6 +20,26 @@ def test_append():
 	}
 
 	interface['sessions'].createIndex('state')
+
+	assert interface.indexes['sessions']['__index__']['state'] == {
+		'new': {
+			'sessions': {
+				'a': True,
+				'c': True
+			}
+		},
+		'processed': {
+			'sessions': {
+				'b': True,
+				'd': True
+			}
+		},
+		'erroneous': {
+			'sessions': {
+				'e': True
+			}
+		}
+	}
 
 	assert interface['sessions'].filter('state', 'new') == [
 		interface['sessions']['a'],

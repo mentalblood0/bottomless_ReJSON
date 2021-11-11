@@ -5,7 +5,7 @@ from bottomless_ReJSON import RedisInterface
 
 
 
-def test_with_index():
+def test_basic():
 
 	interface = RedisInterface(host=config['db']['host'], port=config['db']['port'])
 	interface.clear()
@@ -19,7 +19,10 @@ def test_with_index():
 		'e': {'state': 'erroneous'}
 	}
 
-	interface.indexes['sessions']['__index__']['state'] = {
+	for k in interface['sessions'].keys():
+		interface['sessions'][k].addToIndex('state')
+	
+	assert interface.indexes['sessions']['__index__']['state'] == {
 		'new': {
 			'sessions': {
 				'a': True,
@@ -38,37 +41,6 @@ def test_with_index():
 			}
 		}
 	}
-
-	assert interface['sessions'].filter('state', 'new') == [
-		interface['sessions']['a'],
-		interface['sessions']['c']
-	]
-
-	assert interface['sessions'].filter('state', 'processed') == [
-		interface['sessions']['b'],
-		interface['sessions']['d']
-	]
-
-	assert interface['sessions'].filter('state', 'erroneous') == [
-		interface['sessions']['e']
-	]
-
-
-def test_without_index():
-
-	interface = RedisInterface(host=config['db']['host'], port=config['db']['port'])
-	interface.clear()
-	interface.indexes.clear()
-
-	interface['sessions'] = {
-		'a': {'state': 'new'},
-		'b': {'state': 'processed'},
-		'c': {'state': 'new'},
-		'd': {'state': 'processed'},
-		'e': {'state': 'erroneous'}
-	}
-
-	assert interface.indexes == None
 
 	assert interface['sessions'].filter('state', 'new') == [
 		interface['sessions']['a'],
