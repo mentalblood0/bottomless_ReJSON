@@ -105,6 +105,8 @@ class RedisInterface:
 			return
 		
 		del index[value][self.path[-1]]
+		if not len(index[value]):
+			del index[value]
 	
 	def createIndex(self, field):
 		

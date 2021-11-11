@@ -91,3 +91,27 @@ def test_remove_simple():
 	assert interface['sessions'].filter('state', 'new') == [
 		interface['sessions']['c']
 	]
+
+
+def test_remove_complex():
+
+	interface = RedisInterface(host=config['db']['host'], port=config['db']['port'])
+	interface.indexes.clear()
+	interface.clear()
+
+	interface['sessions'].createIndex('state')
+
+	interface['sessions'] = {
+		'a': {'state': 'new'},
+		'b': {'state': 'processed'},
+		'c': {'state': 'new'},
+		'd': {'state': 'processed'},
+		'e': {'state': 'erroneous'}
+	}
+
+	del interface['sessions']
+
+	assert interface.indexes['sessions']['__index__']['state']() == {}
+	assert interface['sessions'].filter('state', 'new') == []
+	assert interface['sessions'].filter('state', 'processed') == []
+	assert interface['sessions'].filter('state', 'erroneous') == []
