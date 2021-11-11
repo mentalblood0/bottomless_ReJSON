@@ -139,7 +139,10 @@ class RedisInterface:
 
 		if type(payload) == dict:
 			for k in payload.keys():
-				self.addToIndex(k)
+				self[k].updateIndexes(payload[k])
+		else:
+			if self.parent:
+				self.parent.addToIndex(self.path[-1])
 
 	def set(self, value):
 
