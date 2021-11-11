@@ -24,7 +24,7 @@ def test_basic():
 	interface['sessions']['a'].removeFromIndex('state')
 	del interface['sessions']['a']
 
-	assert interface.indexes['sessions']['__index__']['state']['new']['sessions']['a']() == None
+	assert interface.indexes['sessions']['__index__']['state']['new']['a']() == None
 
 	assert interface['sessions'].filter('state', 'new') == [
 		interface['sessions']['c']

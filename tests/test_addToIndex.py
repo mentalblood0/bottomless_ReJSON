@@ -25,21 +25,15 @@ def test_basic():
 	
 	assert interface.indexes['sessions']['__index__']['state'] == {
 		'new': {
-			'sessions': {
-				'a': True,
-				'c': True
-			}
+			'a': True,
+			'c': True
 		},
 		'processed': {
-			'sessions': {
-				'b': True,
-				'd': True
-			}
+			'b': True,
+			'd': True
 		},
 		'erroneous': {
-			'sessions': {
-				'e': True
-			}
+			'e': True
 		}
 	}
 

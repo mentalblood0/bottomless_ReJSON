@@ -89,7 +89,7 @@ class RedisInterface:
 		if not value:
 			return False
 		
-		(index[value] + self.path).set(True)
+		(index[value][self.path[-1]]).set(True)
 
 		return True
 	
@@ -104,7 +104,7 @@ class RedisInterface:
 		if not value:
 			return
 		
-		del (index[value] + self.path).parent[self.path[-1]]
+		del index[value][self.path[-1]]
 	
 	def createIndex(self, field):
 		
@@ -125,12 +125,11 @@ class RedisInterface:
 
 		index = self.getIndex(field)
 
-		paths_dict = index[value]() or {}
-		paths = flatten(paths_dict, enumerate_types=(list,)).keys()
+		keys = index[value]() or {}
 
 		return [
-			RedisInterface(self.db, p, root_key=self.root_key)
-			for p in paths
+			self[k]
+			for k in keys
 		]
 
 	def set(self, value):
