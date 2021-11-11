@@ -1,6 +1,4 @@
-import redis
 from rejson import Client, Path
-from flatten_dict import flatten
 
 
 
