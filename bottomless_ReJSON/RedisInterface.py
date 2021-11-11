@@ -65,23 +65,38 @@ class RedisInterface:
 		return RedisInterface(self.db, self.path + [key], root_key=self.root_key)
 	
 	def filter(self, field, value):
-		
-		paths_dict = (self.indexes + self)['__index__'][field][value]()
-		if paths_dict == None:
+
+		index = self.getIndex(field)
+		if not index:
 			return [
 				self[k]
 				for k in self.keys()
 				if self[k][field] == value
 			]
+		
+		paths_dict = (self.indexes + self)['__index__'][field][value]() or {}
 
 		paths = flatten(paths_dict, enumerate_types=(list,)).keys()
 
 		return [
-			RedisInterface(self.db, p)
+			RedisInterface(self.db, p, root_key=self.root_key)
 			for p in paths
 		]
 	
+	def getIndex(self, field):
+		
+		index = (self.indexes + self)['__index__'][field]
+		
+		if index.type == 'object':
+			return index
+		else:
+			return None
+	
 	def createIndex(self, field):
+		
+		index = (self.indexes + self.path[:-1])['__index__'][field]
+		index.set({})
+		
 		for e in self:
 			e.addToIndex(field)
 	
