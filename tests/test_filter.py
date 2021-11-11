@@ -28,7 +28,7 @@ def test_append():
 		}
 	}
 
-	interface.indexes['sessions']['state']['new'] = [
+	interface.indexes['sessions']['__index__']['state']['new'] = [
 		['sessions', 'a'],
 		['sessions', 'c']
 	]

@@ -67,11 +67,11 @@ class RedisInterface:
 
 		index = self.indexes
 
-		for p in self.path + [field]:
+		for p in self.path + ['__index__', field]:
 
 			if p in index:
 				index = index[p]
-			elif '__any__' in index:
+			elif (p != '__index__') and ('__any__' in index):
 				index = index['__any__']
 			else:
 				return [
