@@ -80,14 +80,19 @@ class RedisInterface:
 	
 	def addToIndex(self, field):
 
+		if not self.parent.isIndexExists(field):
+			return False
+
 		index = self.parent.getIndex(field)
 
 		value = self[field]()
 		(index[value] + self.path).set(True)
+
+		return True
 	
 	def createIndex(self, field):
 		
-		index = self.parent.getIndex(field)
+		index = self.getIndex(field)
 		index.set({})
 		
 		for e in self:
