@@ -107,6 +107,9 @@ class RedisInterface:
 			del index[value]
 	
 	def createIndex(self, field):
+
+		if self.isIndexExists(field):
+			return
 		
 		index = self.getIndex(field)
 		index.set({})
