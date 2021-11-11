@@ -10,12 +10,16 @@ class RedisInterface:
 		path=[],
 		root_key='root',
 		host=None,
-		port=None
+		port=None,
+		indexes=None
 	):
 		
 		self.__db = db if isinstance(db, Client) else Client(host=host, port=port, decode_responses=True)
 		self.__path = path
 		self.__root_key = root_key
+
+		if self.root_key != 'indexes':
+			self.indexes = indexes or RedisInterface(self.db, root_key='indexes')
 	
 	@property
 	def db(self):
@@ -29,17 +33,15 @@ class RedisInterface:
 	def root_key(self):
 		return self.__root_key
 	
+	def _composeReJSONPath(self):
+		return ''.join([
+			f"['{s}']" if type(s) == str else f"[{s}]"
+			for s in self.path
+		]) or '.'
+	
 	@property
 	def _path(self):
-
-		if not self.path:
-			return Path.rootPath()
-		else:
-			path = ''.join([
-				f"['{s}']" if type(s) == str else f"[{s}]"
-				for s in self.path
-			])
-			return Path(path)
+		return Path(self._composeReJSONPath())
 	
 	def keys(self):
 
@@ -60,6 +62,29 @@ class RedisInterface:
 	
 	def __getitem__(self, key):
 		return RedisInterface(self.db, self.path + [key])
+	
+	def filter(self, field, value):
+
+		index = self.indexes
+
+		for p in self.path + [field]:
+
+			if p in index:
+				index = index[p]
+			elif '__any__' in index:
+				index = index['__any__']
+			else:
+				return [
+					self[k]
+					for k in self.keys()
+					if self[k][field] == value
+				]
+		
+		paths = index[value]
+		return [
+			RedisInterface(self.db, p)
+			for p in paths
+		]
 
 	def set(self, value, pipeline=None):
 
@@ -76,6 +101,7 @@ class RedisInterface:
 					value = {
 						self.path[j]: value
 					}
+				
 				db.jsonset(self.root_key, r._path, value)
 				return
 		
@@ -97,7 +123,7 @@ class RedisInterface:
 	def __eq__(self, other):
 
 		if isinstance(other, RedisInterface):
-			return self() == other()
+			return ((self.root_key == other.root_key) and (self.path == other.path)) or (self() == other())
 		else:
 			return self() == other
 	
@@ -159,6 +185,8 @@ class RedisInterface:
 		for k in sorted(self.keys()):
 			yield self[k]
 
+	def __repr__(self):
+		return f"<{self.__class__.__name__} path=\"{self._composeReJSONPath()}\">"
 
 
 import sys
