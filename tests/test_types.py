@@ -8,6 +8,7 @@ from bottomless_ReJSON import RedisInterface
 def test_string():
 
 	interface = RedisInterface(host=config['db']['host'], port=config['db']['port'])
+	interface.indexes.clear()
 	interface.clear()
 
 	interface['key'] = '1'
@@ -17,6 +18,7 @@ def test_string():
 def test_int():
 
 	interface = RedisInterface(host=config['db']['host'], port=config['db']['port'])
+	interface.indexes.clear()
 	interface.clear()
 
 	interface['key'] = 1
@@ -27,6 +29,7 @@ def test_int():
 def test_float():
 
 	interface = RedisInterface(host=config['db']['host'], port=config['db']['port'])
+	interface.indexes.clear()
 	interface.clear()
 
 	interface['key'] = 1.0
@@ -41,6 +44,7 @@ def test_float():
 def test_bool():
 
 	interface = RedisInterface(host=config['db']['host'], port=config['db']['port'])
+	interface.indexes.clear()
 	interface.clear()
 
 	interface['key'] = True
@@ -55,6 +59,7 @@ def test_bool():
 def test_None():
 
 	interface = RedisInterface(host=config['db']['host'], port=config['db']['port'])
+	interface.indexes.clear()
 	interface.clear()
 
 	assert type(interface()) == type(None)

@@ -8,6 +8,7 @@ from bottomless_ReJSON import RedisInterface
 def test_basic():
 
 	interface = RedisInterface(host=config['db']['host'], port=config['db']['port'])
+	interface.indexes.clear()
 	interface.clear()
 
 	interface['key'] = []
@@ -26,6 +27,7 @@ def test_basic():
 def test_valid_key():
 
 	interface = RedisInterface(host=config['db']['host'], port=config['db']['port'])
+	interface.indexes.clear()
 	interface.clear()
 
 	sessions = [{

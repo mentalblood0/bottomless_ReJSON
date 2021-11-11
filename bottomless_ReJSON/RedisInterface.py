@@ -95,8 +95,8 @@ class RedisInterface:
 	
 	def removeFromIndex(self, field):
 
-		if not self.parent.isIndexExists(field):
-			return
+		if not self.parent or not self.parent.isIndexExists(field):
+			return False
 		
 		index = self.parent.getIndex(field)
 		
@@ -132,17 +132,29 @@ class RedisInterface:
 			for k in keys
 		]
 	
-	def updateIndexes(self, payload):
+	def addToIndexes(self, payload):
 
 		if not hasattr(self, 'indexes'):
 			return
 
 		if type(payload) == dict:
 			for k in payload.keys():
-				self[k].updateIndexes(payload[k])
+				self[k].addToIndexes(payload[k])
 		else:
 			if self.parent:
 				self.parent.addToIndex(self.path[-1])
+	
+	def removeFromIndexes(self):
+		
+		if not hasattr(self, 'indexes'):
+			return
+		
+		if self.type == 'object':
+			for k in self.keys():
+				self[k].removeFromIndexes()
+		else:
+			if self.parent:
+				self.parent.removeFromIndex(self.path[-1])
 
 	def set(self, value):
 
@@ -158,12 +170,14 @@ class RedisInterface:
 						self.path[j]: value
 					}
 				
+				r.removeFromIndexes()
 				self.db.jsonset(self.root_key, r._path, value)
-				r.updateIndexes(value)
+				r.addToIndexes(value)
 				return
 		
+		self.removeFromIndexes()
 		self.db.jsonset(self.root_key, self._path, value)
-		self.updateIndexes(value)
+		self.addToIndexes(value)
 
 	def __setitem__(self, key, value):
 
@@ -173,6 +187,7 @@ class RedisInterface:
 		self[key].set(value)
 	
 	def clear(self):
+		self.removeFromIndexes()
 		self.db.jsondel(self.root_key, self._path)
 
 	def __delitem__(self, key):

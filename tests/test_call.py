@@ -10,6 +10,7 @@ from bottomless_ReJSON import RedisInterface
 def test_nonexistent_key():
 
 	interface = RedisInterface(host=config['db']['host'], port=config['db']['port'])
+	interface.indexes.clear()
 	interface.clear()
 
 	assert interface['key'] == None
@@ -19,6 +20,7 @@ def test_nonexistent_key():
 def test_deep():
 
 	interface = RedisInterface(host=config['db']['host'], port=config['db']['port'])
+	interface.indexes.clear()
 	interface.clear()
 
 	interface['1'] = 'one'
@@ -40,6 +42,7 @@ def test_deep():
 def test_change_depth():
 
 	interface = RedisInterface(host=config['db']['host'], port=config['db']['port'])
+	interface.indexes.clear()
 	interface.clear()
 
 	interface['key'] = {

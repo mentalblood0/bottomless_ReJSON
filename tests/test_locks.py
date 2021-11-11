@@ -11,6 +11,7 @@ from bottomless_ReJSON import RedisInterface
 def test_basic():
 
 	interface = RedisInterface(host=config['db']['host'], port=config['db']['port'])
+	interface.indexes.clear()
 	interface.clear()
 
 	results = {'long_get': None}
