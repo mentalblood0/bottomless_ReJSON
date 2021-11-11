@@ -1,3 +1,4 @@
+import redis
 from rejson import Client, Path
 from flatten_dict import flatten
 
@@ -34,6 +35,13 @@ class RedisInterface:
 	def root_key(self):
 		return self.__root_key
 	
+	@property
+	def parent(self):
+		if not self.path:
+			return None
+		else:
+			return RedisInterface(self.db, self.path[:-1], root_key=self.root_key)
+	
 	def _composeReJSONPath(self):
 		return ''.join([
 			f"['{s}']" if type(s) == str else f"[{s}]"
@@ -64,48 +72,45 @@ class RedisInterface:
 	def __getitem__(self, key):
 		return RedisInterface(self.db, self.path + [key], root_key=self.root_key)
 	
+	def getIndex(self, field):
+		return (self.indexes + self)['__index__'][field]
+
+	def isIndexExists(self, field):
+		return self.getIndex(field).type == 'object'
+	
+	def addToIndex(self, field):
+
+		index = self.parent.getIndex(field)
+
+		value = self[field]()
+		(index[value] + self.path).set(True)
+	
+	def createIndex(self, field):
+		
+		index = self.parent.getIndex(field)
+		index.set({})
+		
+		for e in self:
+			e.addToIndex(field)
+	
 	def filter(self, field, value):
 
-		index = self.getIndex(field)
-		if not index:
+		if not self.isIndexExists(field):
 			return [
 				self[k]
 				for k in self.keys()
 				if self[k][field] == value
 			]
-		
-		paths_dict = (self.indexes + self)['__index__'][field][value]() or {}
 
+		index = self.getIndex(field)
+
+		paths_dict = index[value]() or {}
 		paths = flatten(paths_dict, enumerate_types=(list,)).keys()
 
 		return [
 			RedisInterface(self.db, p, root_key=self.root_key)
 			for p in paths
 		]
-	
-	def getIndex(self, field):
-		
-		index = (self.indexes + self)['__index__'][field]
-		
-		if index.type == 'object':
-			return index
-		else:
-			return None
-	
-	def createIndex(self, field):
-		
-		index = (self.indexes + self.path[:-1])['__index__'][field]
-		index.set({})
-		
-		for e in self:
-			e.addToIndex(field)
-	
-	def addToIndex(self, field):
-
-		index = (self.indexes + self.path[:-1])['__index__'][field]
-
-		value = self[field]()
-		(index[value] + self.path).set(True)
 
 	def set(self, value):
 
