@@ -115,3 +115,41 @@ def test_remove_complex():
 	assert interface['sessions'].filter('state', 'new') == []
 	assert interface['sessions'].filter('state', 'processed') == []
 	assert interface['sessions'].filter('state', 'erroneous') == []
+
+
+def test_update():
+
+	interface = RedisInterface(host=config['db']['host'], port=config['db']['port'])
+	interface.indexes.clear()
+	interface.clear()
+
+	interface['sessions'].createIndex('state')
+
+	interface['sessions'] = {
+		'a': {'state': 'new'},
+		'b': {'state': 'processed'},
+		'c': {'state': 'new'},
+		'd': {'state': 'processed'},
+		'e': {'state': 'erroneous'}
+	}
+
+	interface['sessions'] = {
+		'b': {'state': 'processed'},
+		'c': {'state': 'new'},
+		'e': {'state': 'erroneous'},
+		'f': {'state': 'new'}
+	}
+
+	assert interface.indexes['sessions']['__index__']['state']['new']['a']() == None
+	assert interface.indexes['sessions']['__index__']['state']['processed']['d']() == None
+	assert interface.indexes['sessions']['__index__']['state']['new']['f']() == True
+	assert interface['sessions'].filter('state', 'new') == [
+		interface['sessions']['c'],
+		interface['sessions']['f']
+	]
+	assert interface['sessions'].filter('state', 'processed') == [
+		interface['sessions']['b']
+	]
+	assert interface['sessions'].filter('state', 'erroneous') == [
+		interface['sessions']['e']
+	]
