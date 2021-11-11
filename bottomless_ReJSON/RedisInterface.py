@@ -101,7 +101,7 @@ class RedisInterface:
 				index[value] = []
 			index[value].append(e.path)
 
-	def set(self, value, pipeline=None):
+	def set(self, value):
 
 		for i in range(len(self.path)):
 			
