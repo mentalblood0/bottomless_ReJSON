@@ -61,7 +61,7 @@ class RedisInterface:
 		return self.db.jsontype(self.root_key, self._path)
 	
 	def __getitem__(self, key):
-		return RedisInterface(self.db, self.path + [key])
+		return RedisInterface(self.db, self.path + [key], root_key=self.root_key)
 	
 	def filter(self, field, value):
 
@@ -88,13 +88,11 @@ class RedisInterface:
 
 	def set(self, value, pipeline=None):
 
-		db = pipeline or self.db
-
 		for i in range(len(self.path)):
 			
 			path = self.path[:i]
 
-			r = RedisInterface(self.db, path)
+			r = RedisInterface(self.db, path, root_key=self.root_key)
 			if r.type != 'object':
 				
 				for j in reversed(range(i, len(self.path))):
@@ -102,10 +100,10 @@ class RedisInterface:
 						self.path[j]: value
 					}
 				
-				db.jsonset(self.root_key, r._path, value)
+				self.db.jsonset(self.root_key, r._path, value)
 				return
 		
-		db.jsonset(self.root_key, self._path, value)
+		self.db.jsonset(self.root_key, self._path, value)
 
 	def __setitem__(self, key, value):
 
@@ -147,13 +145,8 @@ class RedisInterface:
 			return self.db.jsonarrindex(self.root_key, self._path, key) != -1
 	
 	def update(self, other: dict):
-
-		# pipeline = self.db.pipeline()
-
 		for key, value in other.items():
 			self[key].set(value)
-		
-		# pipeline.execute()
 	
 	def __ior__(self, other: dict): # |=
 		self.update(other)
@@ -180,6 +173,9 @@ class RedisInterface:
 		self.db.jsonarrappend(self.root_key, self._path, *other)
 		
 		return self
+	
+	def __add__(self, other):
+		return RedisInterface(self.db, self.path + other.path, root_key=self.root_key)
 	
 	def __iter__(self):
 		for k in sorted(self.keys()):

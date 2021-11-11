@@ -59,6 +59,47 @@ def test_complex():
 	assert interface['1']['2'] == 'one.two'
 
 
+def test_complex_arrays():
+
+	interface = RedisInterface(host=config['db']['host'], port=config['db']['port'])
+	interface.clear()
+
+	interface['sessions']['__index__']['state']['new'] = [
+		['sessions', 'a'],
+		['sessions', 'c']
+	]
+
+
+def test_complex_indexes_arrays():
+
+	interface = RedisInterface(host=config['db']['host'], port=config['db']['port'])
+	interface.clear()
+	interface.indexes.clear()
+
+	interface['sessions'] = {
+		'a': {
+			'state': 'new'
+		},
+		'b': {
+			'state': 'processed'
+		},
+		'c': {
+			'state': 'new'
+		},
+		'd': {
+			'state': 'processed'
+		},
+		'e': {
+			'state': 'erroneous'
+		}
+	}
+
+	interface.indexes['sessions']['__index__']['state']['new'] = [
+		['sessions', 'a'],
+		['sessions', 'c']
+	]
+
+
 def test_many_complex():
 
 	interface = RedisInterface(host=config['db']['host'], port=config['db']['port'])
