@@ -86,9 +86,25 @@ class RedisInterface:
 		index = self.parent.getIndex(field)
 
 		value = self[field]()
+		if not value:
+			return False
+		
 		(index[value] + self.path).set(True)
 
 		return True
+	
+	def removeFromIndex(self, field):
+
+		if not self.parent.isIndexExists(field):
+			return
+		
+		index = self.parent.getIndex(field)
+		
+		value = self[field]()
+		if not value:
+			return
+		
+		del (index[value] + self.path).parent[self.path[-1]]
 	
 	def createIndex(self, field):
 		

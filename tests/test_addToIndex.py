@@ -19,6 +19,7 @@ def test_basic():
 		'e': {'state': 'erroneous'}
 	}
 
+	interface.indexes['sessions']['__index__']['state'] = {}
 	for k in interface['sessions'].keys():
 		interface['sessions'][k].addToIndex('state')
 	
