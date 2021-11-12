@@ -4,6 +4,32 @@ from redis.client import Pipeline
 from functools import cached_property
 
 
+
+def aggregateSetCalls(calls):
+
+	print('aggregateSetCalls', calls)
+
+	joined = {}
+
+	for path, value in calls:
+		
+		key = '.'.join(path)
+		
+		if key in joined:
+			if type(value) == dict:
+				joined[key] |= value
+				continue
+		
+		joined[key] = value
+	
+	aggregated = [
+		(k.split('.') if k else [], v)
+		for k, v in joined.items()
+	]
+	
+	return aggregated
+
+
 class RedisInterface:
 
 	def __init__(
@@ -149,7 +175,8 @@ class RedisInterface:
 		for e in self:
 			e.addToIndex(field, pipeline, temp)
 		
-		print(json.dumps(temp, indent=4))
+		calls = aggregateSetCalls(temp)
+		self.makeSetsCalls(calls, pipeline)
 		pipeline.execute()
 	
 	def filter(self, field, value):
@@ -169,6 +196,15 @@ class RedisInterface:
 			self[k]
 			for k in keys
 		]
+	
+	def makeSetsCalls(self, calls, pipeline):
+
+		print('makeSetsCalls', json.dumps(calls, indent=4))
+
+		for path, value in calls:
+			_path = RedisInterface(self.db, path, root_key=self.root_key).ReJSON_path
+			print('jsonset', _path, value)
+			pipeline.jsonset(self.root_key, _path, value)
 
 	def set(self, value, pipeline=None, temp=None):
 
@@ -181,19 +217,23 @@ class RedisInterface:
 
 			r = RedisInterface(self.db, path, root_key=self.root_key)
 			if r.type != 'object':
-
-				temp.append((r.path, value))
 				
 				for j in reversed(range(i, len(self.path))):
 					value = {
 						self.path[j]: value
 					}
 				
-				r.removeFromIndexes(db)
-				db.jsonset(self.root_key, r._path, value)
-				r.addToIndexes(value, pipeline, temp)
+				temp.append((r.path, value))
+
+				if self.root_key != 'indexes':
+				
+					r.removeFromIndexes(db)
+					db.jsonset(self.root_key, r._path, value)
+					r.addToIndexes(value, pipeline, temp)
 
 				if not pipeline:
+					calls = aggregateSetCalls(temp)
+					self.makeSetsCalls(calls, db)
 					db.execute()
 
 				return
@@ -205,6 +245,8 @@ class RedisInterface:
 		self.addToIndexes(value, pipeline, temp)
 
 		if not pipeline:
+			calls = aggregateSetCalls(temp)
+			self.makeSetsCalls(calls, db)
 			db.execute()
 
 	def __setitem__(self, key, value):
