@@ -1,6 +1,11 @@
 {
 	"createIndex::same": {
 		"__n__": 1,
+        "__calls__": [
+            "index",
+            "json",
+            "execute"
+        ],
 		"items_number": 100
 	}
 }

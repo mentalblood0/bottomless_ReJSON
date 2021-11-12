@@ -20,6 +20,7 @@ def test_basic():
 	}
 
 	interface['sessions'].createIndex('state')
+	print(interface.indexes())
 
 	assert interface.indexes['sessions']['__index__']['state'] == {
 		'new': {

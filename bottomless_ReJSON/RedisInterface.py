@@ -1,5 +1,6 @@
 from rejson import Client, Path
-
+from redis.client import Pipeline
+from functools import cached_property
 
 
 class RedisInterface:
@@ -40,7 +41,8 @@ class RedisInterface:
 		else:
 			return RedisInterface(self.db, self.path[:-1], root_key=self.root_key)
 	
-	def _composeReJSONPath(self):
+	@cached_property
+	def ReJSON_path(self):
 		return ''.join([
 			f"['{s}']" if type(s) == str else f"[{s}]"
 			for s in self.path
@@ -48,7 +50,7 @@ class RedisInterface:
 	
 	@property
 	def _path(self):
-		return Path(self._composeReJSONPath())
+		return Path(self.ReJSON_path)
 	
 	def keys(self):
 
@@ -76,7 +78,7 @@ class RedisInterface:
 	def isIndexExists(self, field):
 		return self.getIndex(field).type == 'object'
 	
-	def addToIndex(self, field):
+	def addToIndex(self, field, pipeline=None):
 
 		if not self.parent or not self.parent.isIndexExists(field):
 			return False
@@ -87,11 +89,13 @@ class RedisInterface:
 		if not value:
 			return False
 		
-		(index[value][self.path[-1]]).set(True)
+		(index[value][self.path[-1]]).set(True, pipeline)
 
 		return True
 	
-	def removeFromIndex(self, field):
+	def removeFromIndex(self, field, pipeline=None):
+
+		db = pipeline or self.db
 
 		if not self.parent or not self.parent.isIndexExists(field):
 			return False
@@ -102,33 +106,33 @@ class RedisInterface:
 		if not value:
 			return
 		
-		del index[value][self.path[-1]]
+		index[value].__delitem__(self.path[-1], db)
 		if not len(index[value]):
-			del index[value]
+			index.__delitem__(value, db)
 	
-	def addToIndexes(self, payload):
+	def addToIndexes(self, payload, pipeline=None):
 
 		if not hasattr(self, 'indexes'):
 			return
 
 		if type(payload) == dict:
 			for k in payload.keys():
-				self[k].addToIndexes(payload[k])
+				self[k].addToIndexes(payload[k], pipeline)
 		else:
 			if self.parent:
-				self.parent.addToIndex(self.path[-1])
+				self.parent.addToIndex(self.path[-1], pipeline)
 	
-	def removeFromIndexes(self):
+	def removeFromIndexes(self, pipeline=None):
 		
 		if not hasattr(self, 'indexes'):
 			return
 		
 		if self.type == 'object':
 			for k in self.keys():
-				self[k].removeFromIndexes()
+				self[k].removeFromIndexes(pipeline)
 		else:
 			if self.parent:
-				self.parent.removeFromIndex(self.path[-1])
+				self.parent.removeFromIndex(self.path[-1], pipeline)
 	
 	def createIndex(self, field):
 
@@ -137,9 +141,13 @@ class RedisInterface:
 		
 		index = self.getIndex(field)
 		index.set({})
+
+		pipeline = self.db.pipeline()
 		
 		for e in self:
-			e.addToIndex(field)
+			e.addToIndex(field, pipeline)
+		
+		pipeline.execute()
 	
 	def filter(self, field, value):
 
@@ -159,7 +167,9 @@ class RedisInterface:
 			for k in keys
 		]
 
-	def set(self, value):
+	def set(self, value, pipeline=None):
+
+		db = pipeline or self.db.pipeline()
 
 		for i in range(len(self.path)):
 			
@@ -173,14 +183,21 @@ class RedisInterface:
 						self.path[j]: value
 					}
 				
-				r.removeFromIndexes()
-				self.db.jsonset(self.root_key, r._path, value)
-				r.addToIndexes(value)
+				r.removeFromIndexes(db)
+				db.jsonset(self.root_key, r._path, value)
+				r.addToIndexes(value, pipeline)
+
+				if not pipeline:
+					db.execute()
+
 				return
 		
-		self.removeFromIndexes()
-		self.db.jsonset(self.root_key, self._path, value)
-		self.addToIndexes(value)
+		self.removeFromIndexes(db)
+		db.jsonset(self.root_key, self._path, value)
+		self.addToIndexes(value, pipeline)
+
+		if not pipeline:
+			db.execute()
 
 	def __setitem__(self, key, value):
 
@@ -189,12 +206,18 @@ class RedisInterface:
 
 		self[key].set(value)
 	
-	def clear(self):
-		self.removeFromIndexes()
-		self.db.jsondel(self.root_key, self._path)
+	def clear(self, pipeline=None):
 
-	def __delitem__(self, key):
-		self[key].clear()
+		db = pipeline or self.db.pipeline()
+
+		self.removeFromIndexes(db)
+		db.jsondel(self.root_key, self._path)
+
+		if not pipeline:
+			db.execute()
+
+	def __delitem__(self, key, pipeline=None):
+		self[key].clear(pipeline)
 	
 	def __eq__(self, other):
 
@@ -266,7 +289,7 @@ class RedisInterface:
 			yield self[k]
 
 	def __repr__(self):
-		return f"<{self.__class__.__name__} root_key=\"{self.root_key}\" path=\"{self._composeReJSONPath()}\">"
+		return f"<{self.__class__.__name__} root_key=\"{self.root_key}\" path=\"{self.ReJSON_path}\">"
 
 
 import sys

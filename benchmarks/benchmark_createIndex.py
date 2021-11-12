@@ -21,6 +21,6 @@ class same(Benchmark):
 	def run(self, **kwargs):
 		self.interface['sessions'].createIndex('state')
 	
-	def clear(self, **kwargs):
+	def clean(self, **kwargs):
 		self.interface.indexes.clear()
 		self.interface.clear()
