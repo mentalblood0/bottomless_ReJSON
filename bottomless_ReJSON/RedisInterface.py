@@ -1,3 +1,4 @@
+import json
 from rejson import Client, Path
 from redis.client import Pipeline
 from functools import cached_property
@@ -78,7 +79,7 @@ class RedisInterface:
 	def isIndexExists(self, field):
 		return self.getIndex(field).type == 'object'
 	
-	def addToIndex(self, field, pipeline=None):
+	def addToIndex(self, field, pipeline=None, temp=None):
 
 		if not self.parent or not self.parent.isIndexExists(field):
 			return False
@@ -89,7 +90,7 @@ class RedisInterface:
 		if not value:
 			return False
 		
-		(index[value][self.path[-1]]).set(True, pipeline)
+		(index[value][self.path[-1]]).set(True, pipeline, temp)
 
 		return True
 	
@@ -110,7 +111,7 @@ class RedisInterface:
 		if not len(index[value]):
 			index.__delitem__(value, db)
 	
-	def addToIndexes(self, payload, pipeline=None):
+	def addToIndexes(self, payload, pipeline=None, temp=None):
 
 		if not hasattr(self, 'indexes'):
 			return
@@ -120,7 +121,7 @@ class RedisInterface:
 				self[k].addToIndexes(payload[k], pipeline)
 		else:
 			if self.parent:
-				self.parent.addToIndex(self.path[-1], pipeline)
+				self.parent.addToIndex(self.path[-1], pipeline, temp)
 	
 	def removeFromIndexes(self, pipeline=None):
 		
@@ -143,10 +144,12 @@ class RedisInterface:
 		index.set({})
 
 		pipeline = self.db.pipeline()
+		temp = []
 		
 		for e in self:
-			e.addToIndex(field, pipeline)
+			e.addToIndex(field, pipeline, temp)
 		
+		print(json.dumps(temp, indent=4))
 		pipeline.execute()
 	
 	def filter(self, field, value):
@@ -167,9 +170,10 @@ class RedisInterface:
 			for k in keys
 		]
 
-	def set(self, value, pipeline=None):
+	def set(self, value, pipeline=None, temp=None):
 
 		db = pipeline or self.db.pipeline()
+		temp = temp if temp != None else []
 
 		for i in range(len(self.path)):
 			
@@ -177,6 +181,8 @@ class RedisInterface:
 
 			r = RedisInterface(self.db, path, root_key=self.root_key)
 			if r.type != 'object':
+
+				temp.append((r.path, value))
 				
 				for j in reversed(range(i, len(self.path))):
 					value = {
@@ -185,16 +191,18 @@ class RedisInterface:
 				
 				r.removeFromIndexes(db)
 				db.jsonset(self.root_key, r._path, value)
-				r.addToIndexes(value, pipeline)
+				r.addToIndexes(value, pipeline, temp)
 
 				if not pipeline:
 					db.execute()
 
 				return
 		
+		temp.append([self.path, value])
+
 		self.removeFromIndexes(db)
 		db.jsonset(self.root_key, self._path, value)
-		self.addToIndexes(value, pipeline)
+		self.addToIndexes(value, pipeline, temp)
 
 		if not pipeline:
 			db.execute()

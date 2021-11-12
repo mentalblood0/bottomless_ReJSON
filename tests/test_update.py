@@ -32,6 +32,32 @@ def test_basic():
 	}
 
 
+def test_not_empty():
+
+	interface = RedisInterface(host=config['db']['host'], port=config['db']['port'])
+	interface.indexes.clear()
+	interface.clear()
+
+	interface['key'] = {
+		'a': 1
+	}
+
+	interface['key'] |= {
+		'b': {
+			'c': 3,
+			'd': 4
+		}
+	}
+
+	assert interface['key']() == {
+		'a': 1,
+		'b': {
+			'c': 3,
+			'd': 4
+		}
+	}
+
+
 def test_not_dict():
 
 	interface = RedisInterface(host=config['db']['host'], port=config['db']['port'])
