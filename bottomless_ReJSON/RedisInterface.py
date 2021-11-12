@@ -175,6 +175,7 @@ class RedisInterface:
 		for e in self:
 			e.addToIndex(field, pipeline, temp)
 		
+		print('index:', index.path, index())
 		calls = aggregateSetCalls(temp)
 		self.makeSetsCalls(calls, pipeline)
 		pipeline.execute()
@@ -200,6 +201,7 @@ class RedisInterface:
 	def makeSetsCalls(self, calls, pipeline):
 
 		print('makeSetsCalls', json.dumps(calls, indent=4))
+		print(f'current {self.root_key} state: {self()}')
 
 		for path, value in calls:
 			_path = RedisInterface(self.db, path, root_key=self.root_key).ReJSON_path
@@ -208,46 +210,35 @@ class RedisInterface:
 
 	def set(self, value, pipeline=None, temp=None):
 
-		db = pipeline or self.db.pipeline()
-		temp = temp if temp != None else []
-
-		for i in range(len(self.path)):
-			
-			path = self.path[:i]
-
-			r = RedisInterface(self.db, path, root_key=self.root_key)
-			if r.type != 'object':
-				
-				for j in reversed(range(i, len(self.path))):
-					value = {
-						self.path[j]: value
-					}
-				
-				temp.append((r.path, value))
-
-				if self.root_key != 'indexes':
-				
-					r.removeFromIndexes(db)
-					db.jsonset(self.root_key, r._path, value)
-					r.addToIndexes(value, pipeline, temp)
-
-				if not pipeline:
-					calls = aggregateSetCalls(temp)
-					self.makeSetsCalls(calls, db)
-					db.execute()
-
-				return
-		
-		temp.append([self.path, value])
-
-		self.removeFromIndexes(db)
-		db.jsonset(self.root_key, self._path, value)
-		self.addToIndexes(value, pipeline, temp)
-
 		if not pipeline:
-			calls = aggregateSetCalls(temp)
-			self.makeSetsCalls(calls, db)
-			db.execute()
+			print('jsonset', self.path, value)
+			self.db.jsonset(self.root_key, self._path, value)
+			return
+
+		pipeline = self.db.pipeline()
+		temp = temp if temp != None else []
+		temp.append((self.path, value))
+
+		# for i in range(len(self.path)):
+			
+		# 	path = self.path[:i]
+
+		# 	r = RedisInterface(self.db, path, root_key=self.root_key)
+		# 	if r.type != 'object':
+				
+		# 		for j in reversed(range(i, len(self.path))):
+		# 			value = {
+		# 				self.path[j]: value
+		# 			}
+				
+		# 		temp.append((r.path, value))
+
+		# 		if not pipeline:
+		# 			calls = aggregateSetCalls(temp)
+		# 			self.makeSetsCalls(calls, db)
+		# 			db.execute()
+
+		# 		return
 
 	def __setitem__(self, key, value):
 
