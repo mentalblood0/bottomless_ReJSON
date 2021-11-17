@@ -10,20 +10,22 @@ def aggregateSetCalls(calls):
 
 	joined = {}
 
-	for path, value in calls:
+	for root_key, path, value in calls:
 		
 		key = '.'.join(path)
 		
-		if key in joined:
-			if type(value) == dict:
-				joined[key] |= value
-				continue
+		if not root_key in joined:
+			joined[root_key] = {}
 		
-		joined[key] = value
+		if not key in joined[root_key]:
+			joined[root_key][key] = value
+		else:
+			joined[root_key][key] |= value
 	
 	aggregated = [
-		(k.split('.') if k else [], v)
-		for k, v in joined.items()
+		(r, k.split('.') if k else [], v)
+		for r in joined
+		for k, v in joined[r].items()
 	]
 	
 	return aggregated
@@ -172,8 +174,9 @@ class RedisInterface:
 		for e in self:
 			e.addToIndex(field, temp)
 		
-		print('index:', index.path, index())
+		print('index before:', index())
 		self.makeSetsCalls(temp)
+		print('index after:', index())
 	
 	def filter(self, field, value):
 
@@ -204,9 +207,9 @@ class RedisInterface:
 
 			temp = []
 			
-			for path, value in calls:
+			for root_key, path, value in calls:
 
-				print((path, value))
+				print((root_key, path, value))
 
 				raw_set = True
 				
@@ -214,9 +217,8 @@ class RedisInterface:
 				
 					path_ = path[:i]
 
-					r = RedisInterface(self.db, path_, root_key=self.root_key)
-					print(path_, 'is', r.type)
-					if r.type != 'object':
+					r = RedisInterface(self.db, path_, root_key=root_key)
+					if pipe.jsontype(self.root_key, r._path) != 'object':
 
 						raw_set = False
 						
@@ -224,20 +226,21 @@ class RedisInterface:
 							value = {
 								path[j]: value
 							}
-						temp.append((r.path, value))
+						temp.append((root_key, path_, value))
 						
 						break
 				
 				if raw_set:
-					temp.append((path, value))
+					temp.append((root_key, path, value))
 			
 			aggregated_calls = aggregateSetCalls(temp)
 			print('makeSetsCalls temp:', json.dumps(temp, indent=4))
-			# print('makeSetsCalls aggregated_calls:', json.dumps(temp, indent=4))
-			for path, value in aggregated_calls:
+			print('makeSetsCalls aggregated_calls:', json.dumps(aggregated_calls, indent=4))
+			pipe.multi()
+			for root_key, path, value in aggregated_calls:
 				_path = RedisInterface(self.db, path, root_key=self.root_key).ReJSON_path
-				print('jsonset', _path, value)
-				pipe.jsonset(self.root_key, _path, value)
+				print('transaction jsonset', _path, value)
+				pipe.jsonset(root_key, _path, value)
 			
 		self.db.transaction(transaction_function, 'default')
 
@@ -246,10 +249,10 @@ class RedisInterface:
 		print('set', self, value, temp)
 
 		if temp == None:
-			self.makeSetsCalls([(self.path, value)])
+			self.makeSetsCalls([(self.root_key, self.path, value)])
 			return
 
-		temp.append((self.path, value))
+		temp.append((self.root_key, self.path, value))
 
 	def __setitem__(self, key, value):
 
