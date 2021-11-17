@@ -15,6 +15,8 @@ def test_add_simple():
 	
 	interface['sessions']['f'] = {'state': 'new'}
 
+	print(interface.indexes())
+
 	assert interface.indexes['sessions']['__index__']['state']['new']['f']() == True
 	assert interface['sessions'].filter('state', 'new') == [
 		interface['sessions']['f']

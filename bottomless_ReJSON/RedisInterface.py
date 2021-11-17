@@ -121,17 +121,22 @@ class RedisInterface:
 	def isIndexExists(self, field):
 		return self.getIndex(field).type == 'object'
 	
-	def addToIndex(self, field, temp=None):
+	def addToIndex(self, field, temp=None, value=None):
 
-		if not self.parent or not self.parent.isIndexExists(field):
-			return False
+		print('addToIndex', self, field)
 
-		index = self.parent.getIndex(field)
+		if value == None:
 
-		value = self[field]()
-		if not value:
-			return False
+			if not self.parent or not self.parent.isIndexExists(field):
+				print('not self.parent or not self.parent.isIndex.Exists')
+				return False
+
+			value = self[field]()
+			if not value:
+				print(f"not value: self['{field}'] == {value}")
+				return False
 		
+		index = self.parent.getIndex(field)
 		(index[value][self.path[-1]]).set(True, temp)
 
 		return True
@@ -155,6 +160,8 @@ class RedisInterface:
 	
 	def addToIndexes(self, payload, temp=None):
 
+		print('addToIndexes', self, payload)
+
 		if not hasattr(self, 'indexes'):
 			return
 
@@ -163,7 +170,7 @@ class RedisInterface:
 				self[k].addToIndexes(payload[k], temp)
 		else:
 			if self.parent:
-				self.parent.addToIndex(self.path[-1], temp)
+				self.parent.addToIndex(self.path[-1], temp, value=payload)
 	
 	def removeFromIndexes(self, pipeline=None):
 		
@@ -189,9 +196,7 @@ class RedisInterface:
 		for e in self:
 			e.addToIndex(field, temp)
 		
-		print('index before:', index())
 		self.makeSetsCalls(temp)
-		print('index after:', index())
 	
 	def filter(self, field, value):
 
@@ -211,10 +216,27 @@ class RedisInterface:
 			for k in keys
 		]
 	
+	def composeCorrectSetCall(self, value):
+	
+		for i in range(len(self.path)):
+				
+			path_ = self.path[:i]
+
+			r = RedisInterface(self.db, path_, root_key=self.root_key)
+			if r.type != 'object':
+				
+				for j in reversed(range(i, len(self.path))):
+					value = {
+						self.path[j]: value
+					}
+				
+				return (self.root_key, path_, value)
+		
+		return (self.root_key, path, value)
+	
 	def makeSetsCalls(self, calls):
 
 		print('makeSetsCalls', json.dumps(calls, indent=4))
-		print(f'current {self.root_key} state: {self()}')
 
 		def transaction_function(pipe):
 
@@ -226,35 +248,17 @@ class RedisInterface:
 
 				print((root_key, path, value))
 
-				raw_set = True
-				
-				for i in range(len(path)):
-				
-					path_ = path[:i]
-
-					r = RedisInterface(self.db, path_, root_key=root_key)
-					if pipe.jsontype(self.root_key, r._path) != 'object':
-
-						raw_set = False
-						
-						for j in reversed(range(i, len(path))):
-							value = {
-								path[j]: value
-							}
-						temp.append((root_key, path_, value))
-						
-						break
-				
-				if raw_set:
-					temp.append((root_key, path, value))
+				r = RedisInterface(self.db, path, root_key=root_key)
+				correct_set_call = r.composeCorrectSetCall(value)
+				temp.append(correct_set_call)
 			
 			aggregated_calls = aggregateSetCalls(temp)
-			print('makeSetsCalls temp:', json.dumps(temp, indent=4))
-			print('makeSetsCalls aggregated_calls:', json.dumps(aggregated_calls, indent=4))
+			print('temp:', json.dumps(temp, indent=4))
+			print('aggregated_calls:', json.dumps(aggregated_calls, indent=4))
 			pipe.multi()
 			for root_key, path, value in aggregated_calls:
 				_path = RedisInterface(self.db, path, root_key=self.root_key).ReJSON_path
-				print('transaction jsonset', _path, value)
+				print('jsonset', _path, value)
 				pipe.jsonset(root_key, _path, value)
 			
 		self.db.transaction(transaction_function, 'default')
@@ -265,9 +269,8 @@ class RedisInterface:
 
 		if temp == None:
 			self.makeSetsCalls([(self.root_key, self.path, value)])
-			return
-
-		temp.append((self.root_key, self.path, value))
+		else:
+			temp.append((self.root_key, self.path, value))
 
 	def __setitem__(self, key, value):
 
@@ -360,6 +363,9 @@ class RedisInterface:
 
 	def __repr__(self):
 		return f"<{self.__class__.__name__} root_key=\"{self.root_key}\" path=\"{self.ReJSON_path}\">"
+	
+	def __bool__(self):
+		return True
 
 
 import sys
