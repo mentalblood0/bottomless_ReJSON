@@ -6,6 +6,21 @@ from functools import cached_property
 
 
 
+def joinDicts(*args):
+
+	result = {}
+
+	for d in args:
+		
+		for key in d:
+			if key in result:
+				result[key] = joinDicts(result[key], d[key])
+			else:
+				result[key] = d[key]
+	
+	return result
+
+
 def aggregateSetCalls(calls):
 
 	joined = {}
@@ -20,7 +35,7 @@ def aggregateSetCalls(calls):
 		if not key in joined[root_key]:
 			joined[root_key][key] = value
 		else:
-			joined[root_key][key] |= value
+			joined[root_key][key] = joinDicts(joined[root_key][key], value)
 	
 	aggregated = [
 		(r, k.split('.') if k else [], v)
