@@ -232,7 +232,7 @@ class RedisInterface:
 				
 				return (self.root_key, path_, value)
 		
-		return (self.root_key, path, value)
+		return (self.root_key, self.path, value)
 	
 	def makeSetsCalls(self, calls):
 
@@ -241,19 +241,8 @@ class RedisInterface:
 		def transaction_function(pipe):
 
 			print('transaction_function')
-
-			temp = []
 			
-			for root_key, path, value in calls:
-
-				print((root_key, path, value))
-
-				r = RedisInterface(self.db, path, root_key=root_key)
-				correct_set_call = r.composeCorrectSetCall(value)
-				temp.append(correct_set_call)
-			
-			aggregated_calls = aggregateSetCalls(temp)
-			print('temp:', json.dumps(temp, indent=4))
+			aggregated_calls = aggregateSetCalls(calls)
 			print('aggregated_calls:', json.dumps(aggregated_calls, indent=4))
 			pipe.multi()
 			for root_key, path, value in aggregated_calls:
@@ -267,10 +256,16 @@ class RedisInterface:
 
 		print('set', self, value, temp)
 
-		if temp == None:
-			self.makeSetsCalls([(self.root_key, self.path, value)])
+		new_calls = []
+		new_calls.append(self.composeCorrectSetCall(value))
+
+		if self.root_key != 'index':
+			self.addToIndexes(value, new_calls)
+		
+		if temp != None:
+			temp.extend(new_calls)
 		else:
-			temp.append((self.root_key, self.path, value))
+			self.makeSetsCalls(new_calls)
 
 	def __setitem__(self, key, value):
 
