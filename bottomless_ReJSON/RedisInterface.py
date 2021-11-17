@@ -1,4 +1,5 @@
 import json
+from redis import Redis
 from rejson import Client, Path
 from redis.client import Pipeline
 from functools import cached_property
@@ -105,7 +106,7 @@ class RedisInterface:
 	def isIndexExists(self, field):
 		return self.getIndex(field).type == 'object'
 	
-	def addToIndex(self, field, pipeline=None, temp=None):
+	def addToIndex(self, field, temp=None):
 
 		if not self.parent or not self.parent.isIndexExists(field):
 			return False
@@ -116,7 +117,7 @@ class RedisInterface:
 		if not value:
 			return False
 		
-		(index[value][self.path[-1]]).set(True, pipeline, temp)
+		(index[value][self.path[-1]]).set(True, temp)
 
 		return True
 	
@@ -137,17 +138,17 @@ class RedisInterface:
 		if not len(index[value]):
 			index.__delitem__(value, db)
 	
-	def addToIndexes(self, payload, pipeline=None, temp=None):
+	def addToIndexes(self, payload, temp=None):
 
 		if not hasattr(self, 'indexes'):
 			return
 
 		if type(payload) == dict:
 			for k in payload.keys():
-				self[k].addToIndexes(payload[k], pipeline)
+				self[k].addToIndexes(payload[k], temp)
 		else:
 			if self.parent:
-				self.parent.addToIndex(self.path[-1], pipeline, temp)
+				self.parent.addToIndex(self.path[-1], temp)
 	
 	def removeFromIndexes(self, pipeline=None):
 		
@@ -169,16 +170,12 @@ class RedisInterface:
 		index = self.getIndex(field)
 		index.set({})
 
-		pipeline = self.db.pipeline()
 		temp = []
-		
 		for e in self:
-			e.addToIndex(field, pipeline, temp)
+			e.addToIndex(field, temp)
 		
 		print('index:', index.path, index())
-		calls = aggregateSetCalls(temp)
-		self.makeSetsCalls(calls, pipeline)
-		pipeline.execute()
+		self.makeSetsCalls(temp)
 	
 	def filter(self, field, value):
 
@@ -198,47 +195,55 @@ class RedisInterface:
 			for k in keys
 		]
 	
-	def makeSetsCalls(self, calls, pipeline):
+	def makeSetsCalls(self, calls):
 
 		print('makeSetsCalls', json.dumps(calls, indent=4))
 		print(f'current {self.root_key} state: {self()}')
 
-		for path, value in calls:
-			_path = RedisInterface(self.db, path, root_key=self.root_key).ReJSON_path
-			print('jsonset', _path, value)
-			pipeline.jsonset(self.root_key, _path, value)
+		def transaction_function(pipe):
 
-	def set(self, value, pipeline=None, temp=None):
+			print('transaction_function')
 
-		if not pipeline:
-			print('jsonset', self.path, value)
-			self.db.jsonset(self.root_key, self._path, value)
+			temp = []
+			
+			for path, value in calls:
+				
+				for i in range(len(path)):
+				
+					path_ = path[:i]
+
+					r = RedisInterface(self.db, path_, root_key=self.root_key)
+					if r.type == 'object':
+						print((path, value), '=> object')
+						temp.append((path, value))
+					
+					else:
+						print((path, value), '=> not object')
+						for j in reversed(range(i, len(path))):
+							value = {
+								path[j]: value
+							}
+						temp.append((r.path, value))
+			
+			aggregated_calls = aggregateSetCalls(temp)
+			print('makeSetsCalls temp:', json.dumps(temp, indent=4))
+			print('makeSetsCalls aggregated_calls:', json.dumps(temp, indent=4))
+			for path, value in aggregated_calls:
+				_path = RedisInterface(self.db, path, root_key=self.root_key).ReJSON_path
+				print('jsonset', _path, value)
+				pipe.jsonset(self.root_key, _path, value)
+			
+		self.db.transaction(transaction_function, 'default')
+
+	def set(self, value, temp=None):
+
+		print('set', self, value, temp)
+
+		if temp == None:
+			self.makeSetsCalls([(self.path, value)])
 			return
 
-		pipeline = self.db.pipeline()
-		temp = temp if temp != None else []
 		temp.append((self.path, value))
-
-		# for i in range(len(self.path)):
-			
-		# 	path = self.path[:i]
-
-		# 	r = RedisInterface(self.db, path, root_key=self.root_key)
-		# 	if r.type != 'object':
-				
-		# 		for j in reversed(range(i, len(self.path))):
-		# 			value = {
-		# 				self.path[j]: value
-		# 			}
-				
-		# 		temp.append((r.path, value))
-
-		# 		if not pipeline:
-		# 			calls = aggregateSetCalls(temp)
-		# 			self.makeSetsCalls(calls, db)
-		# 			db.execute()
-
-		# 		return
 
 	def __setitem__(self, key, value):
 
