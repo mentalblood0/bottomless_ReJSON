@@ -27,7 +27,7 @@ def aggregateSetCalls(calls):
 
 	for root_key, path, value in calls:
 		
-		key = '.'.join(path)
+		key = json.dumps(path)
 		
 		if not root_key in joined:
 			joined[root_key] = {}
@@ -38,7 +38,7 @@ def aggregateSetCalls(calls):
 			joined[root_key][key] = joinDicts(joined[root_key][key], value)
 	
 	aggregated = [
-		(r, k.split('.') if k else [], v)
+		(r, json.loads(k) if k else [], v)
 		for r in joined
 		for k, v in joined[r].items()
 	]
@@ -125,11 +125,14 @@ class RedisInterface:
 
 		print('addToIndex', self, field)
 
-		if value == None:
+		if not self.parent:
+			return False
+		
+		if not self.parent or not self.parent.isIndexExists(field):
+			print('not self.parent or not self.parent.isIndex.Exists')
+			return False
 
-			if not self.parent or not self.parent.isIndexExists(field):
-				print('not self.parent or not self.parent.isIndex.Exists')
-				return False
+		if value == None:
 
 			value = self[field]()
 			if not value:
@@ -223,12 +226,15 @@ class RedisInterface:
 			path_ = self.path[:i]
 
 			r = RedisInterface(self.db, path_, root_key=self.root_key)
-			if r.type != 'object':
+			if r.type not in ['object', 'array']:
 				
 				for j in reversed(range(i, len(self.path))):
-					value = {
-						self.path[j]: value
-					}
+					if type(self.path[j]) != int:
+						value = {
+							self.path[j]: value
+						}
+					else:
+						value = [value]
 				
 				return (self.root_key, path_, value)
 		
@@ -244,6 +250,7 @@ class RedisInterface:
 			
 			aggregated_calls = aggregateSetCalls(calls)
 			print('aggregated_calls:', json.dumps(aggregated_calls, indent=4))
+			
 			pipe.multi()
 			for root_key, path, value in aggregated_calls:
 				_path = RedisInterface(self.db, path, root_key=self.root_key).ReJSON_path
@@ -256,9 +263,7 @@ class RedisInterface:
 
 		print('set', self, value, temp)
 
-		new_calls = []
-		new_calls.append(self.composeCorrectSetCall(value))
-
+		new_calls = [self.composeCorrectSetCall(value)]
 		if self.root_key != 'index':
 			self.addToIndexes(value, new_calls)
 		
