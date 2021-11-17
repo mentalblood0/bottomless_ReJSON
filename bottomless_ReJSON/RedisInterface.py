@@ -8,8 +8,6 @@ from functools import cached_property
 
 def aggregateSetCalls(calls):
 
-	print('aggregateSetCalls', calls)
-
 	joined = {}
 
 	for path, value in calls:
@@ -207,27 +205,35 @@ class RedisInterface:
 			temp = []
 			
 			for path, value in calls:
+
+				print((path, value))
+
+				raw_set = True
 				
 				for i in range(len(path)):
 				
 					path_ = path[:i]
 
 					r = RedisInterface(self.db, path_, root_key=self.root_key)
-					if r.type == 'object':
-						print((path, value), '=> object')
-						temp.append((path, value))
-					
-					else:
-						print((path, value), '=> not object')
+					print(path_, 'is', r.type)
+					if r.type != 'object':
+
+						raw_set = False
+						
 						for j in reversed(range(i, len(path))):
 							value = {
 								path[j]: value
 							}
 						temp.append((r.path, value))
+						
+						break
+				
+				if raw_set:
+					temp.append((path, value))
 			
 			aggregated_calls = aggregateSetCalls(temp)
 			print('makeSetsCalls temp:', json.dumps(temp, indent=4))
-			print('makeSetsCalls aggregated_calls:', json.dumps(temp, indent=4))
+			# print('makeSetsCalls aggregated_calls:', json.dumps(temp, indent=4))
 			for path, value in aggregated_calls:
 				_path = RedisInterface(self.db, path, root_key=self.root_key).ReJSON_path
 				print('jsonset', _path, value)
