@@ -1,50 +1,10 @@
 import json
-from types import new_class
-from redis import Redis
 from rejson import Client, Path
-from redis.client import Pipeline
 from functools import cached_property
 
-
-
-def joinDicts(*args):
-
-	result = {}
-
-	for d in args:
-		
-		for key in d:
-			if key in result:
-				result[key] = joinDicts(result[key], d[key])
-			else:
-				result[key] = d[key]
-	
-	return result
-
-
-def aggregateSetCalls(calls):
-
-	joined = {}
-
-	for root_key, path, value in calls:
-		
-		key = json.dumps(path)
-		
-		if not root_key in joined:
-			joined[root_key] = {}
-		
-		if not key in joined[root_key]:
-			joined[root_key][key] = value
-		else:
-			joined[root_key][key] = joinDicts(joined[root_key][key], value)
-	
-	aggregated = [
-		(r, json.loads(k) if k else [], v)
-		for r in joined
-		for k, v in joined[r].items()
-	]
-	
-	return aggregated
+from . import Calls
+from .common import *
+from .calls import SetCall
 
 
 class RedisInterface:
@@ -87,10 +47,7 @@ class RedisInterface:
 	
 	@cached_property
 	def ReJSON_path(self):
-		return ''.join([
-			f"['{s}']" if type(s) == str else f"[{s}]"
-			for s in self.path
-		]) or '.'
+		return composeRejsonPath(self.path)
 	
 	@property
 	def _path(self):
@@ -194,7 +151,7 @@ class RedisInterface:
 		index = self.getIndex(field)
 		index.set({})
 
-		temp = []
+		temp = Calls()
 		for e in self:
 			e.addToIndex(field, temp)
 		
@@ -217,28 +174,7 @@ class RedisInterface:
 			self[k]
 			for k in keys
 		]
-	
-	def composeCorrectSetCall(self, value):
-	
-		for i in range(len(self.path)):
-				
-			path_ = self.path[:i]
 
-			r = RedisInterface(self.db, path_, root_key=self.root_key)
-			if r.type not in ['object', 'array']:
-				
-				for j in reversed(range(i, len(self.path))):
-					if type(self.path[j]) != int:
-						value = {
-							self.path[j]: value
-						}
-					else:
-						value = [value]
-				
-				return (self.root_key, path_, value)
-		
-		return (self.root_key, self.path, value)
-	
 	def makeSetsCalls(self, calls):
 
 		print('makeSetsCalls', json.dumps(calls, indent=4))
@@ -247,24 +183,24 @@ class RedisInterface:
 
 			print('transaction_function')
 
-			for i, c in enumerate(calls):
-				
-				root_key, path, value = c
-				r = RedisInterface(self.db, path, root_key=root_key)
-				
-				if root_key != 'index':
-					r.addToIndexes(value, calls)
-				
-				calls[i] = r.composeCorrectSetCall(value)
+			prepared_calls = Calls()
 
-			aggregated_calls = aggregateSetCalls(calls)
+			for c in calls:
+				
+				indexes_calls = Calls()
+				if c.root_key != 'index':
+					r = RedisInterface(self.db, c.path, root_key=c.root_key)
+					r.addToIndexes(c.value, indexes_calls)
+				
+				prepared_calls.append(c.getCorrect(self.db))
+				prepared_calls.extend([ic.getCorrect(self.db) for ic in indexes_calls])
+
+			aggregated_calls = prepared_calls.aggregate()
 			print('aggregated_calls:', json.dumps(aggregated_calls, indent=4))
 			
 			pipe.multi()
-			for root_key, path, value in aggregated_calls:
-				_path = RedisInterface(self.db, path, root_key=self.root_key).ReJSON_path
-				print('jsonset', _path, value)
-				pipe.jsonset(root_key, _path, value)
+			for c in aggregated_calls:
+				c(pipe)
 			
 		self.db.transaction(transaction_function, 'default')
 
@@ -272,12 +208,12 @@ class RedisInterface:
 
 		print('set', self, value, temp)
 
-		new_call = (self.root_key, self.path, value)
+		new_call = SetCall(('jsonset', (self.root_key, self.path, value)))
 		
 		if temp != None:
 			temp.append(new_call)
 		else:
-			self.makeSetsCalls([new_call])
+			self.makeSetsCalls(Calls([new_call]))
 
 	def __setitem__(self, key, value):
 
