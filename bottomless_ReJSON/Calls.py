@@ -84,7 +84,10 @@ class Calls(list):
 		
 		result = []
 
-		for name, calls in calls_by_method_name.items():
+		for name in ['jsondel', 'jsonset']:
+			if not name in calls_by_method_name:
+				continue
+			calls = calls_by_method_name[name]
 			result.extend(aggregate(calls, name))
 		
 		return result

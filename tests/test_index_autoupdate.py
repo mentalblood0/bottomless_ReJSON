@@ -148,6 +148,7 @@ def test_update():
 	assert interface.indexes['sessions']['__index__']['state']['new']['a']() == None
 	assert interface.indexes['sessions']['__index__']['state']['processed']['d']() == None
 	assert interface.indexes['sessions']['__index__']['state']['new']['f']() == True
+	print("interface['sessions'].filter('state', 'new')", interface['sessions'].filter('state', 'new'))
 	assert interface['sessions'].filter('state', 'new') == [
 		interface['sessions']['c'],
 		interface['sessions']['f']
