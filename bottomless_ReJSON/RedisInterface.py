@@ -1,4 +1,5 @@
 import json
+from types import new_class
 from redis import Redis
 from rejson import Client, Path
 from redis.client import Pipeline
@@ -247,7 +248,17 @@ class RedisInterface:
 		def transaction_function(pipe):
 
 			print('transaction_function')
-			
+
+			for i, c in enumerate(calls):
+				
+				root_key, path, value = c
+				r = RedisInterface(self.db, path, root_key=root_key)
+				
+				if root_key != 'index':
+					r.addToIndexes(value, calls)
+				
+				calls[i] = r.composeCorrectSetCall(value)
+
 			aggregated_calls = aggregateSetCalls(calls)
 			print('aggregated_calls:', json.dumps(aggregated_calls, indent=4))
 			
@@ -263,14 +274,12 @@ class RedisInterface:
 
 		print('set', self, value, temp)
 
-		new_calls = [self.composeCorrectSetCall(value)]
-		if self.root_key != 'index':
-			self.addToIndexes(value, new_calls)
+		new_call = (self.root_key, self.path, value)
 		
 		if temp != None:
-			temp.extend(new_calls)
+			temp.append(new_call)
 		else:
-			self.makeSetsCalls(new_calls)
+			self.makeSetsCalls([new_call])
 
 	def __setitem__(self, key, value):
 
