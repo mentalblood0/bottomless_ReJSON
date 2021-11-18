@@ -3,8 +3,23 @@
 		"__n__": 1,
         "__calls__": [
             "index",
-            "json",
-            "execute"
+            "json"
+        ],
+		"items_number": 100
+	},
+    "createIndex::different": {
+		"__n__": 1,
+        "__calls__": [
+            "index",
+            "json"
+        ],
+		"items_number": 100
+	},
+    "clear::without_index": {
+		"__n__": 1,
+        "__calls__": [
+            "index",
+            "json"
         ],
 		"items_number": 100
 	}
