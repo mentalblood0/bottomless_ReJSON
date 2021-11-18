@@ -113,7 +113,10 @@ def test_remove_complex():
 
 	del interface['sessions']
 
-	assert interface.indexes['sessions']['__index__']['state']() == {}
+	print('indexes', interface.indexes())
+
+	for state_value in ['new', 'processed', 'erroneous']:
+		assert interface.indexes['sessions']['__index__']['state'][state_value]() == {}
 	assert interface['sessions'].filter('state', 'new') == []
 	assert interface['sessions'].filter('state', 'processed') == []
 	assert interface['sessions'].filter('state', 'erroneous') == []

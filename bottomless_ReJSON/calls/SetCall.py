@@ -47,6 +47,7 @@ class SetCall(Call):
 		indexes_calls = []
 		
 		r = RedisInterface.RedisInterface(db, self.path, root_key=self.root_key)
+		# r.removeFromIndexes(indexes_calls)
 		r.addToIndexes(self.value, indexes_calls)
 		
 		return indexes_calls

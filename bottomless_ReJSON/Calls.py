@@ -23,8 +23,6 @@ def joinDicts(*args):
 
 def aggregate(calls, method_name):
 
-	print('aggregate', calls, method_name)
-
 	if method_name == 'jsonset':
 
 		joined = {}
@@ -62,7 +60,8 @@ def aggregate(calls, method_name):
 					current[p] = None
 				
 				else:
-					current[p] = {}
+					if not p in current or type(current[p]) != dict:
+						current[p] = {}
 					current = current[p]
 
 		return [
