@@ -199,3 +199,34 @@ def test_update_complex():
 	assert interface['key']['sessions'].filter('state', 'erroneous') == [
 		interface['key']['sessions']['e']
 	]
+
+
+def test_clear():
+
+	interface = RedisInterface(host=config['db']['host'], port=config['db']['port'])
+	interface.indexes.clear()
+	interface.clear()
+
+	assert interface() == None
+
+	interface['sessions'].createIndex('state')
+
+	interface['sessions'] = {
+		'a': {'state': 'new'},
+		'b': {'state': 'processed'},
+		'c': {'state': 'new'},
+		'd': {'state': 'processed'},
+		'e': {'state': 'erroneous'}
+	}
+
+	print('clear')
+	interface.clear()
+
+	print('interface', interface())
+	assert interface() == None
+
+	for state_value in ['new', 'processed', 'erroneous']:
+		assert interface.indexes['sessions']['__index__']['state'][state_value]() == {}
+	assert interface['sessions'].filter('state', 'new') == []
+	assert interface['sessions'].filter('state', 'processed') == []
+	assert interface['sessions'].filter('state', 'erroneous') == []

@@ -179,7 +179,7 @@ class RedisInterface:
 			for c in prepared_calls:
 				c(pipe)
 			
-		self.db.transaction(transaction_function, 'default')
+		result = self.db.transaction(transaction_function, 'default')
 
 	def set(self, value, temp=None):
 

@@ -50,8 +50,12 @@ def aggregate(calls, method_name):
 	elif method_name == 'jsondel':
 
 		joined = {}
+		result = []
 
 		for _, (root_key, path) in calls:
+
+			if not path:
+				result.append(DeleteCall((method_name, (root_key, path))))
 
 			current = joined
 			for i, p in enumerate(path):
@@ -64,10 +68,12 @@ def aggregate(calls, method_name):
 						current[p] = {}
 					current = current[p]
 
-		return [
+		result += [
 			DeleteCall((method_name, (root_key, list(path)))) 
-			for path in (flatten(joined) or [[]])
+			for path in flatten(joined)
 		]
+		
+		return result
 
 
 class Calls(list):
