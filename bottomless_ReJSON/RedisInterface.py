@@ -145,9 +145,7 @@ class RedisInterface:
 
 		return True
 	
-	def removeFromIndex(self, field, pipeline=None):
-
-		db = pipeline or self.db
+	def removeFromIndex(self, field, temp=None):
 
 		if not self.parent or not self.parent.isIndexExists(field):
 			return False
@@ -158,9 +156,9 @@ class RedisInterface:
 		if not value:
 			return
 		
-		index[value].__delitem__(self.path[-1], db)
+		index[value].__delitem__(self.path[-1], temp)
 		if not len(index[value]):
-			index.__delitem__(value, db)
+			index.__delitem__(value, temp)
 	
 	def addToIndexes(self, payload, temp=None):
 
@@ -176,17 +174,17 @@ class RedisInterface:
 			if self.parent:
 				self.parent.addToIndex(self.path[-1], temp, value=payload)
 	
-	def removeFromIndexes(self, pipeline=None):
+	def removeFromIndexes(self, temp=None):
 		
 		if not hasattr(self, 'indexes'):
 			return
 		
 		if self.type == 'object':
 			for k in self.keys():
-				self[k].removeFromIndexes(pipeline)
+				self[k].removeFromIndexes(temp)
 		else:
 			if self.parent:
-				self.parent.removeFromIndex(self.path[-1], pipeline)
+				self.parent.removeFromIndex(self.path[-1], temp)
 	
 	def createIndex(self, field):
 
@@ -288,18 +286,11 @@ class RedisInterface:
 
 		self[key].set(value)
 	
-	def clear(self, pipeline=None):
+	def clear(self, temp=None):
+		self.set(None, temp)
 
-		db = pipeline or self.db.pipeline()
-
-		self.removeFromIndexes(db)
-		db.jsondel(self.root_key, self._path)
-
-		if not pipeline:
-			db.execute()
-
-	def __delitem__(self, key, pipeline=None):
-		self[key].clear(pipeline)
+	def __delitem__(self, key, temp=None):
+		self[key].clear(temp)
 	
 	def __eq__(self, other):
 
