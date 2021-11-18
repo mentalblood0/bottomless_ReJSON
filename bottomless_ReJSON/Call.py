@@ -13,6 +13,13 @@ class Call(tuple):
 
 	def getAdditionalCalls(self, db):
 		return []
+	
+	def getPreparedArgs(self):
+		return self.args
+	
+	def __call__(self, pipe):
+		print(f"{self.method_name}{self.getPreparedArgs()}")
+		return getattr(pipe, self.method_name)(*self.getPreparedArgs())
 
 
 

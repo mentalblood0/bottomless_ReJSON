@@ -25,9 +25,10 @@ def test_deep():
 
 	interface['1'] = 'one'
 	interface['2'] = 'two'
-	print('interface', interface())
 	interface['1']['1']['1'] = 'one.one.one'
 	interface['1']['2'] = 'one.two'
+
+	print('interface', interface())
 
 	assert interface() == {
 		'1': {

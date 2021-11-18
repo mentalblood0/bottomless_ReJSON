@@ -4,7 +4,7 @@ from functools import cached_property
 
 from . import Calls
 from .common import *
-from .calls import SetCall
+from .calls import *
 
 
 class RedisInterface:
@@ -149,7 +149,7 @@ class RedisInterface:
 		for e in self:
 			e.addToIndex(field, temp)
 		
-		self.makeSetsCalls(temp)
+		self.makeCalls(temp)
 	
 	def filter(self, field, value):
 
@@ -169,11 +169,9 @@ class RedisInterface:
 			for k in keys
 		]
 
-	def makeSetsCalls(self, calls):
+	def makeCalls(self, calls):
 
 		def transaction_function(pipe):
-
-			print('transaction_function')
 
 			prepared_calls = calls.getPrepared(self.db)
 			print('prepared calls:', json.dumps(prepared_calls, indent=4))
@@ -191,7 +189,7 @@ class RedisInterface:
 		if temp != None:
 			temp.append(new_call)
 		else:
-			self.makeSetsCalls(Calls([new_call]))
+			self.makeCalls(Calls([new_call]))
 
 	def __setitem__(self, key, value):
 
@@ -201,7 +199,15 @@ class RedisInterface:
 		self[key].set(value)
 	
 	def clear(self, temp=None):
-		self.set(None, temp)
+		print('clear', self)
+		# self.set(None, temp)
+
+		new_call = DeleteCall(('jsondel', (self.root_key, self.path)))
+		
+		if temp != None:
+			temp.append(new_call)
+		else:
+			self.makeCalls(Calls([new_call]))
 
 	def __delitem__(self, key, temp=None):
 		self[key].clear(temp)

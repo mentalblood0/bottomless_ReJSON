@@ -7,14 +7,20 @@ from bottomless_ReJSON import RedisInterface
 
 def test_simple():
 
-	interface = RedisInterface.RedisInterface(config['db']['url'])
+	interface = RedisInterface.RedisInterface(host=config['db']['host'], port=config['db']['port'])
+	interface.indexes.clear()
+	interface.clear()
+	interface.clear()
 
 	assert interface['a'] + interface['b'] == interface['a']['b']
 
 
 def test_complex():
 
-	interface = RedisInterface.RedisInterface(config['db']['url'])
+	interface = RedisInterface.RedisInterface(host=config['db']['host'], port=config['db']['port'])
+	interface.indexes.clear()
+	interface.clear()
+	interface.clear()
 
 	assert interface['a']['b'] \
 		 + interface['c']['d']['e'] \

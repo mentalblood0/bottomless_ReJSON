@@ -10,6 +10,9 @@ class same(Benchmark):
 	def prepare(self, items_number):
 
 		self.interface = RedisInterface.RedisInterface(host=config['db']['host'], port=config['db']['port'])
+	interface.indexes.clear()
+	interface.clear()
+	interface.clear()
 		self.interface.indexes.clear()
 		self.interface.clear()
 

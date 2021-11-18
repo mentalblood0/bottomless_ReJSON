@@ -50,12 +50,9 @@ class SetCall(Call):
 		r.addToIndexes(self.value, indexes_calls)
 		
 		return indexes_calls
-
-	def __call__(self, pipe):
-
-		args = (self.root_key, composeRejsonPath(self.path), self.value)
-
-		return getattr(pipe, self.method_name)(*args)
+	
+	def getPreparedArgs(self):
+		return (self.root_key, composeRejsonPath(self.path), self.value)
 
 
 

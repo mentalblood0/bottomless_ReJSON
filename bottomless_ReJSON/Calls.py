@@ -23,6 +23,8 @@ def joinDicts(*args):
 
 def aggregate(calls, method_name):
 
+	print('aggregate', calls, method_name)
+
 	if method_name == 'jsonset':
 
 		joined = {}
@@ -47,25 +49,28 @@ def aggregate(calls, method_name):
 		
 		return aggregated
 	
-	# elif method_name == 'jsondel':
+	elif method_name == 'jsondel':
 
-	# 	joined = {}
+		joined = {}
 
-	# 	for root_key, path in calls:
+		for _, (root_key, path) in calls:
 
-	# 		current = joined
-	# 		for p in path:
-	# 			current[p] = {}
-	# 			current = current[p]
-		
-	# 	return [(method_name, (root_key, list(path))) for path in flatten(joined)]
+			current = joined
+			for i, p in enumerate(path):
+
+				if i == len(path)-1:
+					current[p] = None
+				
+				else:
+					current[p] = {}
+					current = current[p]
+
+		return [DeleteCall((method_name, (root_key, list(path)))) for path in (flatten(joined) or [[]])]
 
 
 class Calls(list):
 
 	def aggregate(self):
-
-		print('aggregate', type(self), self)
 
 		calls_by_method_name = {}
 
@@ -77,9 +82,7 @@ class Calls(list):
 		
 		result = []
 
-		print('calls_by_method_name', calls_by_method_name)
 		for name, calls in calls_by_method_name.items():
-			print('for', result, calls, name)
 			result.extend(aggregate(calls, name))
 		
 		return result
