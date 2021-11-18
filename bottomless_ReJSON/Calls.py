@@ -65,7 +65,10 @@ def aggregate(calls, method_name):
 					current[p] = {}
 					current = current[p]
 
-		return [DeleteCall((method_name, (root_key, list(path)))) for path in (flatten(joined) or [[]])]
+		return [
+			DeleteCall((method_name, (root_key, list(path)))) 
+			for path in (flatten(joined) or [[]])
+		]
 
 
 class Calls(list):

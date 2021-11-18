@@ -16,17 +16,17 @@ class DeleteCall(Call):
 	def getCorrect(self, db):
 		return DeleteCall((self.method_name, (self.root_key, self.path)))
 	
-	# def getAdditionalCalls(self, db):
+	def getAdditionalCalls(self, db):
 
-	# 	if self.root_key == 'index':
-	# 		return []
+		if self.root_key == 'index':
+			return []
 		
-	# 	indexes_calls = []
+		indexes_calls = []
 		
-	# 	r = RedisInterface.RedisInterface(db, self.path, root_key=self.root_key)
-	# 	r.addToIndexes(self.value, indexes_calls)
+		r = RedisInterface.RedisInterface(db, self.path, root_key=self.root_key)
+		r.removeFromIndexes(indexes_calls)
 		
-	# 	return indexes_calls
+		return indexes_calls
 	
 	def getPreparedArgs(self):
 		return (self.root_key, composeRejsonPath(self.path))
