@@ -4,13 +4,13 @@ from redis import Redis
 from threading import Thread
 
 from tests import config
-from bottomless_ReJSON import RedisInterface
+import bottomless_ReJSON.RedisInterface as RedisInterface
 
 
 
 def test_basic():
 
-	interface = RedisInterface.RedisInterface(host=config['db']['host'], port=config['db']['port'])
+	interface = RedisInterface(host=config['db']['host'], port=config['db']['port'])
 	interface.indexes.clear()
 	interface.clear()
 

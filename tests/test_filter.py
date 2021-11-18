@@ -1,13 +1,13 @@
 import pytest
 
 from tests import config
-from bottomless_ReJSON import RedisInterface
+import bottomless_ReJSON.RedisInterface as RedisInterface
 
 
 
 def test_with_index():
 
-	interface = RedisInterface.RedisInterface(host=config['db']['host'], port=config['db']['port'])
+	interface = RedisInterface(host=config['db']['host'], port=config['db']['port'])
 	interface.indexes.clear()
 	interface.clear()
 
@@ -50,7 +50,7 @@ def test_with_index():
 
 def test_without_index():
 
-	interface = RedisInterface.RedisInterface(host=config['db']['host'], port=config['db']['port'])
+	interface = RedisInterface(host=config['db']['host'], port=config['db']['port'])
 	interface.indexes.clear()
 	interface.clear()
 

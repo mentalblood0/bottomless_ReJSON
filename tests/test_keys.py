@@ -3,13 +3,13 @@ import pytest
 from datetime import datetime
 
 from tests import config
-from bottomless_ReJSON import RedisInterface
+import bottomless_ReJSON.RedisInterface as RedisInterface
 
 
 
 def test_no_keys():
 
-	interface = RedisInterface.RedisInterface(host=config['db']['host'], port=config['db']['port'])
+	interface = RedisInterface(host=config['db']['host'], port=config['db']['port'])
 	interface.indexes.clear()
 	interface.clear()
 
@@ -18,7 +18,7 @@ def test_no_keys():
 
 def test_many_complex():
 
-	interface = RedisInterface.RedisInterface(host=config['db']['host'], port=config['db']['port'])
+	interface = RedisInterface(host=config['db']['host'], port=config['db']['port'])
 	interface.indexes.clear()
 	interface.clear()
 

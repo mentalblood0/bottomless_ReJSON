@@ -27,9 +27,9 @@ Feel free to use the tests as a manual
 ### Preparations
 
 ```python
-from bottomless_ReJSON import RedisInterface
+import bottomless_ReJSON.RedisInterface as RedisInterface
 
-db = RedisInterface.RedisInterface("redis://localhost:6379") # just like redis.from_url
+db = RedisInterface("redis://localhost:6379") # just like redis.from_url
 ```
 
 ### Dictionary-like interface

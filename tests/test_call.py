@@ -3,13 +3,13 @@ from time import sleep
 from rejson import Client, Path
 
 from tests import config
-from bottomless_ReJSON import RedisInterface
+import bottomless_ReJSON.RedisInterface as RedisInterface
 
 
 
 def test_nonexistent_key():
 
-	interface = RedisInterface.RedisInterface(host=config['db']['host'], port=config['db']['port'])
+	interface = RedisInterface(host=config['db']['host'], port=config['db']['port'])
 	interface.indexes.clear()
 	interface.clear()
 
@@ -19,7 +19,7 @@ def test_nonexistent_key():
 
 def test_deep():
 
-	interface = RedisInterface.RedisInterface(host=config['db']['host'], port=config['db']['port'])
+	interface = RedisInterface(host=config['db']['host'], port=config['db']['port'])
 	interface.indexes.clear()
 	interface.clear()
 
@@ -43,7 +43,7 @@ def test_deep():
 
 def test_change_depth():
 
-	interface = RedisInterface.RedisInterface(host=config['db']['host'], port=config['db']['port'])
+	interface = RedisInterface(host=config['db']['host'], port=config['db']['port'])
 	interface.indexes.clear()
 	interface.clear()
 

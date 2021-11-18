@@ -1,13 +1,13 @@
 import pytest
 
 from tests import config
-from bottomless_ReJSON import RedisInterface
+import bottomless_ReJSON.RedisInterface as RedisInterface
 
 
 
 def test_basic():
 
-	interface = RedisInterface.RedisInterface(host=config['db']['host'], port=config['db']['port'])
+	interface = RedisInterface(host=config['db']['host'], port=config['db']['port'])
 	interface.indexes.clear()
 	interface.clear()
 
@@ -34,7 +34,7 @@ def test_basic():
 
 def test_not_empty():
 
-	interface = RedisInterface.RedisInterface(host=config['db']['host'], port=config['db']['port'])
+	interface = RedisInterface(host=config['db']['host'], port=config['db']['port'])
 	interface.indexes.clear()
 	interface.clear()
 
@@ -60,7 +60,7 @@ def test_not_empty():
 
 def test_not_dict():
 
-	interface = RedisInterface.RedisInterface(host=config['db']['host'], port=config['db']['port'])
+	interface = RedisInterface(host=config['db']['host'], port=config['db']['port'])
 	interface.indexes.clear()
 	interface.clear()
 
@@ -86,7 +86,7 @@ def test_not_dict():
 
 def test_deep_dict_shallow_update():
 
-	interface = RedisInterface.RedisInterface(host=config['db']['host'], port=config['db']['port'])
+	interface = RedisInterface(host=config['db']['host'], port=config['db']['port'])
 	interface.indexes.clear()
 	interface.clear()
 

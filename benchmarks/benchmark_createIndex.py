@@ -1,7 +1,7 @@
 from sharpener import Benchmark
 
 from tests import config
-from bottomless_ReJSON import RedisInterface
+import bottomless_ReJSON.RedisInterface as RedisInterface
 
 
 
@@ -9,7 +9,7 @@ class same(Benchmark):
 
 	def prepare(self, items_number):
 
-		self.interface = RedisInterface.RedisInterface(host=config['db']['host'], port=config['db']['port'])
+		self.interface = RedisInterface(host=config['db']['host'], port=config['db']['port'])
 	interface.indexes.clear()
 	interface.clear()
 	interface.clear()

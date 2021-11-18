@@ -72,6 +72,11 @@ def aggregate(calls, method_name):
 
 class Calls(list):
 
+	methods_order = [
+		'jsondel',
+		'jsonset'
+	]
+
 	def aggregate(self):
 
 		calls_by_method_name = {}
@@ -84,9 +89,11 @@ class Calls(list):
 		
 		result = []
 
-		for name in ['jsondel', 'jsonset']:
+		for name in self.methods_order:
+
 			if not name in calls_by_method_name:
 				continue
+			
 			calls = calls_by_method_name[name]
 			result.extend(aggregate(calls, name))
 		

@@ -126,8 +126,6 @@ class RedisInterface:
 				self.parent.addToIndex(self.path[-1], temp, value=payload)
 	
 	def removeFromIndexes(self, temp=None):
-
-		print('removeFromIndexes', self)
 		
 		if not hasattr(self, 'indexes'):
 			return
@@ -173,12 +171,9 @@ class RedisInterface:
 
 	def makeCalls(self, calls):
 
-		print('makeCalls', json.dumps(calls, indent=4))
-
 		def transaction_function(pipe):
 
 			prepared_calls = calls.getPrepared(self.db)
-			print('prepared calls:', json.dumps(prepared_calls, indent=4))
 			
 			pipe.multi()
 			for c in prepared_calls:
@@ -203,8 +198,6 @@ class RedisInterface:
 		self[key].set(value)
 	
 	def clear(self, temp=None):
-
-		print('clear', self)
 
 		new_call = DeleteCall(('jsondel', (self.root_key, self.path)))
 		
@@ -290,7 +283,3 @@ class RedisInterface:
 	
 	def __bool__(self):
 		return True
-
-
-# import sys
-# sys.modules[__name__] = lambda *args, **kwargs: RedisInterface(*args, **kwargs)

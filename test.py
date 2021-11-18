@@ -1,5 +1,5 @@
 from redis import ResponseError
-from bottomless_ReJSON import RedisInterface
+import bottomless_ReJSON.RedisInterface as RedisInterface
 from redisearch import Client, IndexDefinition, TextField, IndexType
 
 

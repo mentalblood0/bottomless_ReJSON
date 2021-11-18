@@ -1,1 +1,1 @@
-from . import RedisInterface
+from .RedisInterface import RedisInterface

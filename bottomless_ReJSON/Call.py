@@ -18,7 +18,6 @@ class Call(tuple):
 		return self.args
 	
 	def __call__(self, pipe):
-		print(f"{self.method_name}{self.getPreparedArgs()}")
 		return getattr(pipe, self.method_name)(*self.getPreparedArgs())
 
 
