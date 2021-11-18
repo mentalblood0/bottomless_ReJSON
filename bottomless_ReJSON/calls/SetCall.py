@@ -1,5 +1,6 @@
 from .. import Call
 from ..common import *
+from .. import RedisInterface
 
 
 class SetCall(Call):
@@ -38,6 +39,18 @@ class SetCall(Call):
 		
 		return SetCall((self.method_name, (self.root_key, self.path, self.value)))
 	
+	def getAdditionalCalls(self, db):
+
+		if self.root_key == 'index':
+			return []
+		
+		indexes_calls = []
+		
+		r = RedisInterface.RedisInterface(db, self.path, root_key=self.root_key)
+		r.addToIndexes(self.value, indexes_calls)
+		
+		return indexes_calls
+
 	def __call__(self, pipe):
 
 		args = (self.root_key, composeRejsonPath(self.path), self.value)

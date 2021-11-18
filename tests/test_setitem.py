@@ -11,7 +11,7 @@ from bottomless_ReJSON import RedisInterface
 
 def test_basic():
 
-	interface = RedisInterface(host=config['db']['host'], port=config['db']['port'])
+	interface = RedisInterface.RedisInterface(host=config['db']['host'], port=config['db']['port'])
 	interface.indexes.clear()
 	interface.clear()
 
@@ -30,7 +30,7 @@ def test_basic():
 
 def test_types():
 
-	interface = RedisInterface(host=config['db']['host'], port=config['db']['port'])
+	interface = RedisInterface.RedisInterface(host=config['db']['host'], port=config['db']['port'])
 	interface.indexes.clear()
 	interface.clear()
 
@@ -49,7 +49,7 @@ def test_types():
 
 def test_complex():
 
-	interface = RedisInterface(host=config['db']['host'], port=config['db']['port'])
+	interface = RedisInterface.RedisInterface(host=config['db']['host'], port=config['db']['port'])
 	interface.indexes.clear()
 	interface.clear()
 
@@ -64,7 +64,7 @@ def test_complex():
 
 def test_complex_arrays():
 
-	interface = RedisInterface(host=config['db']['host'], port=config['db']['port'])
+	interface = RedisInterface.RedisInterface(host=config['db']['host'], port=config['db']['port'])
 	interface.indexes.clear()
 	interface.clear()
 
@@ -76,7 +76,7 @@ def test_complex_arrays():
 
 def test_complex_indexes_arrays():
 
-	interface = RedisInterface(host=config['db']['host'], port=config['db']['port'])
+	interface = RedisInterface.RedisInterface(host=config['db']['host'], port=config['db']['port'])
 	interface.indexes.clear()
 	interface.clear()
 
@@ -106,7 +106,7 @@ def test_complex_indexes_arrays():
 
 def test_many_complex():
 
-	interface = RedisInterface(host=config['db']['host'], port=config['db']['port'])
+	interface = RedisInterface.RedisInterface(host=config['db']['host'], port=config['db']['port'])
 	interface.indexes.clear()
 	interface.clear()
 
@@ -137,7 +137,7 @@ def test_many_complex():
 
 def test_async():
 
-	interface = RedisInterface(host=config['db']['host'], port=config['db']['port'])
+	interface = RedisInterface.RedisInterface(host=config['db']['host'], port=config['db']['port'])
 	interface.indexes.clear()
 	interface.clear()
 

@@ -7,7 +7,7 @@ from bottomless_ReJSON import RedisInterface
 
 def test_basic():
 
-	interface = RedisInterface(host=config['db']['host'], port=config['db']['port'])
+	interface = RedisInterface.RedisInterface(host=config['db']['host'], port=config['db']['port'])
 	interface.indexes.clear()
 	interface.clear()
 

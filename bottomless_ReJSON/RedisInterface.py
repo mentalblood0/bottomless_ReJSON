@@ -81,20 +81,16 @@ class RedisInterface:
 	
 	def addToIndex(self, field, temp=None, value=None):
 
-		print('addToIndex', self, field)
-
 		if not self.parent:
 			return False
 		
 		if not self.parent or not self.parent.isIndexExists(field):
-			print('not self.parent or not self.parent.isIndex.Exists')
 			return False
 
 		if value == None:
 
 			value = self[field]()
 			if not value:
-				print(f"not value: self['{field}'] == {value}")
 				return False
 		
 		index = self.parent.getIndex(field)
@@ -118,8 +114,6 @@ class RedisInterface:
 			index.__delitem__(value, temp)
 	
 	def addToIndexes(self, payload, temp=None):
-
-		print('addToIndexes', self, payload)
 
 		if not hasattr(self, 'indexes'):
 			return
@@ -177,36 +171,20 @@ class RedisInterface:
 
 	def makeSetsCalls(self, calls):
 
-		print('makeSetsCalls', json.dumps(calls, indent=4))
-
 		def transaction_function(pipe):
 
 			print('transaction_function')
 
-			prepared_calls = Calls()
-
-			for c in calls:
-				
-				indexes_calls = Calls()
-				if c.root_key != 'index':
-					r = RedisInterface(self.db, c.path, root_key=c.root_key)
-					r.addToIndexes(c.value, indexes_calls)
-				
-				prepared_calls.append(c.getCorrect(self.db))
-				prepared_calls.extend([ic.getCorrect(self.db) for ic in indexes_calls])
-
-			aggregated_calls = prepared_calls.aggregate()
-			print('aggregated_calls:', json.dumps(aggregated_calls, indent=4))
+			prepared_calls = calls.getPrepared(self.db)
+			print('prepared calls:', json.dumps(prepared_calls, indent=4))
 			
 			pipe.multi()
-			for c in aggregated_calls:
+			for c in prepared_calls:
 				c(pipe)
 			
 		self.db.transaction(transaction_function, 'default')
 
 	def set(self, value, temp=None):
-
-		print('set', self, value, temp)
 
 		new_call = SetCall(('jsonset', (self.root_key, self.path, value)))
 		
@@ -304,5 +282,5 @@ class RedisInterface:
 		return True
 
 
-import sys
-sys.modules[__name__] = RedisInterface
+# import sys
+# sys.modules[__name__] = lambda *args, **kwargs: RedisInterface(*args, **kwargs)

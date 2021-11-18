@@ -7,7 +7,7 @@ from bottomless_ReJSON import RedisInterface
 
 def test_valid_key():
 
-	interface = RedisInterface(host=config['db']['host'], port=config['db']['port'])
+	interface = RedisInterface.RedisInterface(host=config['db']['host'], port=config['db']['port'])
 	interface['key'] = 'value'
 
 	del interface['key']
@@ -15,7 +15,7 @@ def test_valid_key():
 
 def test_cascade():
 
-	interface = RedisInterface(host=config['db']['host'], port=config['db']['port'])
+	interface = RedisInterface.RedisInterface(host=config['db']['host'], port=config['db']['port'])
 
 	interface['1'] = 'one'
 	interface['2'] = 'two'

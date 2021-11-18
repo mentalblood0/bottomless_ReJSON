@@ -5,7 +5,7 @@ from bottomless_ReJSON import RedisInterface
 
 def test_dict():
 
-	db = RedisInterface(host=config['db']['host'], port=config['db']['port'])
+	db = RedisInterface.RedisInterface(host=config['db']['host'], port=config['db']['port'])
 	
 	db.clear()
 	d = {
@@ -30,7 +30,7 @@ def test_dict():
 
 def test_list():
 
-	db = RedisInterface(host=config['db']['host'], port=config['db']['port'])
+	db = RedisInterface.RedisInterface(host=config['db']['host'], port=config['db']['port'])
 
 	db.clear()
 	db['key'] = []

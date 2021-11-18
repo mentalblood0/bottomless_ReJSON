@@ -7,7 +7,7 @@ from bottomless_ReJSON import RedisInterface
 
 def test_valid_key():
 
-	interface = RedisInterface(host=config['db']['host'], port=config['db']['port'])
+	interface = RedisInterface.RedisInterface(host=config['db']['host'], port=config['db']['port'])
 	interface['key'] = 'value'
 
 	assert interface['key'] == 'value'
@@ -15,7 +15,7 @@ def test_valid_key():
 
 def test_invalid_key():
 
-	interface = RedisInterface(host=config['db']['host'], port=config['db']['port'])
+	interface = RedisInterface.RedisInterface(host=config['db']['host'], port=config['db']['port'])
 	del interface['key']
 
 	assert interface['key'] == None

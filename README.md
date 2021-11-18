@@ -29,7 +29,7 @@ Feel free to use the tests as a manual
 ```python
 from bottomless_ReJSON import RedisInterface
 
-db = RedisInterface("redis://localhost:6379") # just like redis.from_url
+db = RedisInterface.RedisInterface("redis://localhost:6379") # just like redis.from_url
 ```
 
 ### Dictionary-like interface

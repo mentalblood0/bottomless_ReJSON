@@ -1,3 +1,1 @@
-__all__ = [
-	'RedisInterface'
-]
+from . import RedisInterface

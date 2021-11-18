@@ -86,13 +86,16 @@ class Calls(list):
 	
 	def getPrepared(self, db):
 
-		result = []
+		result = Calls([])
 
 		for c in self:
-			result.append(c.getCorrect(db))
+			result.append(c)
 			result.extend(c.getAdditionalCalls(db))
+		
+		for i, c in enumerate(result):
+			result[i] = c.getCorrect(db)
 
-		return result
+		return result.aggregate()
 
 
 
