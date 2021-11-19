@@ -26,3 +26,4 @@ def test_interrupt():
 		pipe.jsonset('root', '.', {'a': 1})
 	
 	db.transaction(transaction_function, key)
+	assert db.get(key) == value
