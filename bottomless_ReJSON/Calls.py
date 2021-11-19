@@ -123,32 +123,28 @@ class Calls(list):
 	def __call__(self, db):
 
 		id_value = uuid.uuid4().hex
+		transaction_key = f"transaction_{id_value}"
 
 		def transaction_function(pipe):
 
 			prepared_calls = self.getPrepared(db)
 
-			# id_keys = []
-			# for c in prepared_calls:
-			# 	id_keys.append(f"transaction_{c.root_key}{composeRejsonPath(c.path)}")
-				
-
 			id_keys = [f"transaction_{c.root_key}{composeRejsonPath(c.path)}" for c in prepared_calls]
 			for k in id_keys:
 				if pipe.get(k) != id_value:
 					pipe.set(k, id_value)
-					pipe.set(f"transaction_{id_value}", id_value)
+					pipe.set(transaction_key, id_value)
 			
 			pipe.multi()
 
-			db.delete(f"transaction_{id_value}")
+			db.delete(transaction_key)
 			for k in id_keys:
 				pipe.delete(k)
 			
 			for c in prepared_calls:
 				c(pipe)
 			
-		db.transaction(transaction_function, f"transaction_{id_value}")
+		db.transaction(transaction_function, transaction_key)
 
 
 
