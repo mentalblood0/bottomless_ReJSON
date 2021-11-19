@@ -128,6 +128,11 @@ class Calls(list):
 
 			prepared_calls = self.getPrepared(db)
 
+			# id_keys = []
+			# for c in prepared_calls:
+			# 	id_keys.append(f"transaction_{c.root_key}{composeRejsonPath(c.path)}")
+				
+
 			id_keys = [f"transaction_{c.root_key}{composeRejsonPath(c.path)}" for c in prepared_calls]
 			for k in id_keys:
 				if pipe.get(k) != id_value:
@@ -143,7 +148,7 @@ class Calls(list):
 			for c in prepared_calls:
 				c(pipe)
 			
-		db.transaction(transaction_function, id_value)
+		db.transaction(transaction_function, f"transaction_{id_value}")
 
 
 
