@@ -149,7 +149,7 @@ class RedisInterface:
 		for e in self:
 			e.addToIndex(field, temp)
 		
-		self.makeCalls(temp)
+		temp(self.db, [self.ReJSON_path])
 	
 	def filter(self, field, value):
 
@@ -169,18 +169,6 @@ class RedisInterface:
 			for k in keys
 		]
 
-	def makeCalls(self, calls):
-
-		def transaction_function(pipe):
-
-			prepared_calls = calls.getPrepared(self.db)
-			
-			pipe.multi()
-			for c in prepared_calls:
-				c(pipe)
-			
-		result = self.db.transaction(transaction_function, 'default')
-
 	def set(self, value, temp=None):
 
 		new_call = SetCall(('jsonset', (self.root_key, self.path, value)))
@@ -188,7 +176,7 @@ class RedisInterface:
 		if temp != None:
 			temp.append(new_call)
 		else:
-			self.makeCalls(Calls([new_call]))
+			Calls([new_call])(self.db, [self.ReJSON_path])
 
 	def __setitem__(self, key, value):
 
@@ -204,7 +192,7 @@ class RedisInterface:
 		if temp != None:
 			temp.append(new_call)
 		else:
-			self.makeCalls(Calls([new_call]))
+			Calls([new_call])(self.db, [self.ReJSON_path])
 
 	def __delitem__(self, key, temp=None):
 		self[key].clear(temp)

@@ -117,6 +117,18 @@ class Calls(list):
 			result[i] = c.getCorrect(db)
 
 		return result.aggregate()
+	
+	def __call__(self, db, transaction_keys=['default']):
+
+		def transaction_function(pipe):
+
+			prepared_calls = self.getPrepared(db)
+			
+			pipe.multi()
+			for c in prepared_calls:
+				c(pipe)
+			
+		db.transaction(transaction_function, *transaction_keys)
 
 
 
