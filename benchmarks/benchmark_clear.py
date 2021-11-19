@@ -10,8 +10,7 @@ class without_index(Benchmark):
 	def prepare(self, items_number):
 
 		self.interface = RedisInterface(host=config['db']['host'], port=config['db']['port'])
-		self.interface.indexes.clear()
-		self.interface.clear()
+		self.interface.db.flushdb()
 
 		self.interface['sessions'] = {
 			str(i): {'state': 'new'}
@@ -22,5 +21,4 @@ class without_index(Benchmark):
 		self.interface.clear()
 	
 	def clean(self, **kwargs):
-		self.interface.indexes.clear()
-		self.interface.clear()
+		self.interface.db.flushdb()

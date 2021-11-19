@@ -9,8 +9,7 @@ import bottomless_ReJSON.RedisInterface as RedisInterface
 def test_interrupt():
 
 	interface = RedisInterface(host=config['db']['host'], port=config['db']['port'])
-	interface.indexes.clear()
-	interface.clear()
+	interface.db.flushdb()
 
 	db = interface.db
 
@@ -31,8 +30,7 @@ def test_interrupt():
 def test_delete_after_multi():
 
 	interface = RedisInterface(host=config['db']['host'], port=config['db']['port'])
-	interface.indexes.clear()
-	interface.clear()
+	interface.db.flushdb()
 
 	db = interface.db
 

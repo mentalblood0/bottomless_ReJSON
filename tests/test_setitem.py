@@ -12,8 +12,7 @@ import bottomless_ReJSON.RedisInterface as RedisInterface
 def test_basic():
 
 	interface = RedisInterface(host=config['db']['host'], port=config['db']['port'])
-	interface.indexes.clear()
-	interface.clear()
+	interface.db.flushdb()
 
 	interface['1'] = 'one'
 	assert interface['1'] == 'one'
@@ -31,8 +30,7 @@ def test_basic():
 def test_types():
 
 	interface = RedisInterface(host=config['db']['host'], port=config['db']['port'])
-	interface.indexes.clear()
-	interface.clear()
+	interface.db.flushdb()
 
 	objects = [
 		[],
@@ -50,8 +48,7 @@ def test_types():
 def test_complex():
 
 	interface = RedisInterface(host=config['db']['host'], port=config['db']['port'])
-	interface.indexes.clear()
-	interface.clear()
+	interface.db.flushdb()
 
 	interface['1'] = {
 		'1': 'one.one',
@@ -65,8 +62,7 @@ def test_complex():
 def test_complex_arrays():
 
 	interface = RedisInterface(host=config['db']['host'], port=config['db']['port'])
-	interface.indexes.clear()
-	interface.clear()
+	interface.db.flushdb()
 
 	interface['sessions']['__index__']['state']['new'] = [
 		['sessions', 'a'],
@@ -77,8 +73,7 @@ def test_complex_arrays():
 def test_complex_indexes_arrays():
 
 	interface = RedisInterface(host=config['db']['host'], port=config['db']['port'])
-	interface.indexes.clear()
-	interface.clear()
+	interface.db.flushdb()
 
 	interface['sessions'] = {
 		'a': {
@@ -107,8 +102,7 @@ def test_complex_indexes_arrays():
 def test_many_complex():
 
 	interface = RedisInterface(host=config['db']['host'], port=config['db']['port'])
-	interface.indexes.clear()
-	interface.clear()
+	interface.db.flushdb()
 
 	sessions = {}
 
@@ -138,8 +132,7 @@ def test_many_complex():
 def test_async():
 
 	interface = RedisInterface(host=config['db']['host'], port=config['db']['port'])
-	interface.indexes.clear()
-	interface.clear()
+	interface.db.flushdb()
 
 	types = {
 		bool: False,

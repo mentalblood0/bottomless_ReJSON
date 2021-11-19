@@ -8,8 +8,7 @@ import bottomless_ReJSON.RedisInterface as RedisInterface
 def test_with_index():
 
 	interface = RedisInterface(host=config['db']['host'], port=config['db']['port'])
-	interface.indexes.clear()
-	interface.clear()
+	interface.db.flushdb()
 
 	interface['sessions'] = {
 		'a': {'state': 'new'},
@@ -32,6 +31,8 @@ def test_with_index():
 			'e': True
 		}
 	}
+	interface.use_indexes_cache = False
+	interface.use_indexes_cache = True
 
 	assert interface['sessions'].filter('state', 'new') == [
 		interface['sessions']['a'],
@@ -51,8 +52,9 @@ def test_with_index():
 def test_without_index():
 
 	interface = RedisInterface(host=config['db']['host'], port=config['db']['port'])
-	interface.indexes.clear()
-	interface.clear()
+	interface.db.flushdb()
+	interface.use_indexes_cache = False
+	interface.use_indexes_cache = True
 
 	interface['sessions'] = {
 		'a': {'state': 'new'},
@@ -64,6 +66,8 @@ def test_without_index():
 
 	assert interface.indexes == None
 
+	interface.use_indexes_cache = False
+	interface.use_indexes_cache = True
 	for state_value in ['new', 'processed', 'erroneous']:
 		with pytest.raises(NotImplementedError):
 			interface['sessions'].filter('state', state_value)

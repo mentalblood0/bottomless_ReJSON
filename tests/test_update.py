@@ -8,8 +8,7 @@ import bottomless_ReJSON.RedisInterface as RedisInterface
 def test_basic():
 
 	interface = RedisInterface(host=config['db']['host'], port=config['db']['port'])
-	interface.indexes.clear()
-	interface.clear()
+	interface.db.flushdb()
 
 	interface |= {
 		'1': {
@@ -35,8 +34,7 @@ def test_basic():
 def test_not_empty():
 
 	interface = RedisInterface(host=config['db']['host'], port=config['db']['port'])
-	interface.indexes.clear()
-	interface.clear()
+	interface.db.flushdb()
 
 	interface['key'] = {
 		'a': 1
@@ -61,8 +59,7 @@ def test_not_empty():
 def test_not_dict():
 
 	interface = RedisInterface(host=config['db']['host'], port=config['db']['port'])
-	interface.indexes.clear()
-	interface.clear()
+	interface.db.flushdb()
 
 	key = '1'
 
@@ -87,8 +84,7 @@ def test_not_dict():
 def test_deep_dict_shallow_update():
 
 	interface = RedisInterface(host=config['db']['host'], port=config['db']['port'])
-	interface.indexes.clear()
-	interface.clear()
+	interface.db.flushdb()
 
 	key = 'key'
 	deep = {

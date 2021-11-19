@@ -1,10 +1,24 @@
-import json
 from rejson import Client, Path
 from functools import cached_property
 
 from . import Calls
 from .common import *
 from .calls import *
+
+
+
+isIndexExists__use_cache = True
+isIndexExists__cache = {}
+
+def isIndexExists(path, db):
+
+	if not isIndexExists__use_cache:
+		return db.jsontype('indexes', path) == 'object'
+	
+	if not path in isIndexExists__cache:
+		isIndexExists__cache[path] = (db.jsontype('indexes', path) == 'object')
+	
+	return isIndexExists__cache[path]
 
 
 class RedisInterface:
@@ -18,7 +32,7 @@ class RedisInterface:
 		port=None,
 		indexes=None
 	):
-		
+
 		self.__db = db if isinstance(db, Client) else Client(host=host, port=port, decode_responses=True)
 		self.__path = path
 		self.__root_key = root_key
@@ -39,11 +53,33 @@ class RedisInterface:
 		return self.__root_key
 	
 	@property
+	def host(self):
+		return self.db.connection_pool.connection_kwargs['host']
+	
+	@property
+	def port(self):
+		return self.db.connection_pool.connection_kwargs['port']
+	
+	@property
+	def use_indexes_cache(self):
+		return isIndexExists__use_cache
+	
+	@use_indexes_cache.setter
+	def use_indexes_cache(self, value: bool):
+		
+		if value == False:
+			global isIndexExists__cache
+			isIndexExists__cache = {}
+		
+		global isIndexExists__use_cache
+		isIndexExists__use_cache = value
+	
+	@property
 	def parent(self):
 		if not self.path:
 			return None
 		else:
-			return RedisInterface(self.db, self.path[:-1], root_key=self.root_key)
+			return RedisInterface(self.db, self.path[:-1], self.root_key, self.host, self.port)
 	
 	@cached_property
 	def ReJSON_path(self):
@@ -77,6 +113,7 @@ class RedisInterface:
 		return (self.indexes + self)['__index__'][field]
 
 	def isIndexExists(self, field):
+		return isIndexExists(composeRejsonPath(self.path + ['__index__', field]), self.db)
 		return self.getIndex(field).type == 'object'
 	
 	def addToIndex(self, field, temp=None, value=None):

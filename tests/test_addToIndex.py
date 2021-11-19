@@ -8,8 +8,7 @@ import bottomless_ReJSON.RedisInterface as RedisInterface
 def test_basic():
 
 	interface = RedisInterface(host=config['db']['host'], port=config['db']['port'])
-	interface.indexes.clear()
-	interface.clear()
+	interface.db.flushdb()
 
 	interface['sessions'] = {
 		'a': {'state': 'new'},
@@ -20,6 +19,8 @@ def test_basic():
 	}
 
 	interface.indexes['sessions']['__index__']['state'] = {}
+	interface.use_indexes_cache = False
+	interface.use_indexes_cache = True
 	for k in interface['sessions'].keys():
 		interface['sessions'][k].addToIndex('state')
 	

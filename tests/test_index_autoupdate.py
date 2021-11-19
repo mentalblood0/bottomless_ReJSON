@@ -8,10 +8,11 @@ import bottomless_ReJSON.RedisInterface as RedisInterface
 def test_add_simple():
 
 	interface = RedisInterface(host=config['db']['host'], port=config['db']['port'])
-	interface.indexes.clear()
-	interface.clear()
+	interface.db.flushdb()
 	
 	interface['sessions'].createIndex('state')
+	interface.use_indexes_cache = False
+	interface.use_indexes_cache = True
 	
 	interface['sessions']['f'] = {'state': 'new'}
 
@@ -26,10 +27,13 @@ def test_add_simple():
 def test_add_complex():
 
 	interface = RedisInterface(host=config['db']['host'], port=config['db']['port'])
-	interface.indexes.clear()
-	interface.clear()
+	interface.db.flushdb()
+	interface.use_indexes_cache = False
+	interface.use_indexes_cache = True
 
 	interface['sessions'].createIndex('state')
+	interface.use_indexes_cache = False
+	interface.use_indexes_cache = True
 
 	interface['sessions'] = {
 		'a': {'state': 'new'},
@@ -48,10 +52,13 @@ def test_add_complex():
 def test_add_simple_after_complex():
 
 	interface = RedisInterface(host=config['db']['host'], port=config['db']['port'])
-	interface.indexes.clear()
-	interface.clear()
+	interface.db.flushdb()
+	interface.use_indexes_cache = False
+	interface.use_indexes_cache = True
 
 	interface['sessions'].createIndex('state')
+	interface.use_indexes_cache = False
+	interface.use_indexes_cache = True
 
 	interface['sessions'] = {
 		'a': {'state': 'new'},
@@ -74,10 +81,13 @@ def test_add_simple_after_complex():
 def test_remove_simple():
 
 	interface = RedisInterface(host=config['db']['host'], port=config['db']['port'])
-	interface.indexes.clear()
-	interface.clear()
+	interface.db.flushdb()
+	interface.use_indexes_cache = False
+	interface.use_indexes_cache = True
 
 	interface['sessions'].createIndex('state')
+	interface.use_indexes_cache = False
+	interface.use_indexes_cache = True
 
 	interface['sessions'] = {
 		'a': {'state': 'new'},
@@ -98,10 +108,13 @@ def test_remove_simple():
 def test_remove_complex():
 
 	interface = RedisInterface(host=config['db']['host'], port=config['db']['port'])
-	interface.indexes.clear()
-	interface.clear()
+	interface.db.flushdb()
+	interface.use_indexes_cache = False
+	interface.use_indexes_cache = True
 
 	interface['sessions'].createIndex('state')
+	interface.use_indexes_cache = False
+	interface.use_indexes_cache = True
 
 	interface['sessions'] = {
 		'a': {'state': 'new'},
@@ -125,10 +138,13 @@ def test_remove_complex():
 def test_update():
 
 	interface = RedisInterface(host=config['db']['host'], port=config['db']['port'])
-	interface.indexes.clear()
-	interface.clear()
+	interface.db.flushdb()
+	interface.use_indexes_cache = False
+	interface.use_indexes_cache = True
 
 	interface['sessions'].createIndex('state')
+	interface.use_indexes_cache = False
+	interface.use_indexes_cache = True
 
 	interface['sessions'] = {
 		'a': {'state': 'new'},
@@ -164,10 +180,11 @@ def test_update():
 def test_update_complex():
 
 	interface = RedisInterface(host=config['db']['host'], port=config['db']['port'])
-	interface.indexes.clear()
-	interface.clear()
+	interface.db.flushdb()
 
 	interface['key']['sessions'].createIndex('state')
+	interface.use_indexes_cache = False
+	interface.use_indexes_cache = True
 
 	interface['key']['sessions'] = {
 		'a': {'state': 'new'},
@@ -204,12 +221,13 @@ def test_update_complex():
 def test_clear():
 
 	interface = RedisInterface(host=config['db']['host'], port=config['db']['port'])
-	interface.indexes.clear()
-	interface.clear()
+	interface.db.flushdb()
 
 	assert interface() == None
 
 	interface['sessions'].createIndex('state')
+	interface.use_indexes_cache = False
+	interface.use_indexes_cache = True
 
 	interface['sessions'] = {
 		'a': {'state': 'new'},
