@@ -149,7 +149,7 @@ class RedisInterface:
 		for e in self:
 			e.addToIndex(field, temp)
 		
-		temp(self.db, [self.ReJSON_path])
+		temp(self.db)
 	
 	def filter(self, field, value):
 
@@ -176,7 +176,7 @@ class RedisInterface:
 		if temp != None:
 			temp.append(new_call)
 		else:
-			Calls([new_call])(self.db, [self.ReJSON_path])
+			Calls([new_call])(self.db)
 
 	def __setitem__(self, key, value):
 
@@ -192,7 +192,7 @@ class RedisInterface:
 		if temp != None:
 			temp.append(new_call)
 		else:
-			Calls([new_call])(self.db, [self.ReJSON_path])
+			Calls([new_call])(self.db)
 
 	def __delitem__(self, key, temp=None):
 		self[key].clear(temp)

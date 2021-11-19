@@ -27,3 +27,22 @@ def test_interrupt():
 	
 	db.transaction(transaction_function, key)
 	assert db.get(key) == value
+
+def test_delete_after_multi():
+
+	interface = RedisInterface(host=config['db']['host'], port=config['db']['port'])
+	interface.indexes.clear()
+	interface.clear()
+
+	db = interface.db
+
+	key = 'default'
+
+	db.set('del', 'lalala')
+
+	def transaction_function(pipe):
+		pipe.multi()
+		pipe.delete('del')
+	
+	db.transaction(transaction_function, key)
+	assert db.get('del') == None

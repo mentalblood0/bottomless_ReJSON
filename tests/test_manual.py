@@ -18,3 +18,5 @@ def test_transaction():
 
 	r.transaction(client_side_incr, 'OUR-SEQUENCE-KEY')
 	assert r.get('OUR-SEQUENCE-KEY') == b'1'
+
+	r.delete('OUR-SEQUENCE-KEY')

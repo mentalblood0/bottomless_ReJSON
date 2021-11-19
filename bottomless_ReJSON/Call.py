@@ -7,6 +7,14 @@ class Call(tuple):
 	@property
 	def args(self):
 		return self[1]
+	
+	@property
+	def root_key(self):
+		return self.args[0]
+
+	@property
+	def path(self):
+		return self.args[1]
 
 	def getCorrect(self, db):
 		return self

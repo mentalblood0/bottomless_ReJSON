@@ -1,8 +1,10 @@
+import uuid
 import json
 from flatten_dict import flatten
 
 from . import Call
 from .calls import *
+from .common import *
 
 
 
@@ -118,17 +120,30 @@ class Calls(list):
 
 		return result.aggregate()
 	
-	def __call__(self, db, transaction_keys=['default']):
+	def __call__(self, db):
+
+		id_value = uuid.uuid4().hex
 
 		def transaction_function(pipe):
 
 			prepared_calls = self.getPrepared(db)
+
+			id_keys = [f"transaction_{c.root_key}{composeRejsonPath(c.path)}" for c in prepared_calls]
+			for k in id_keys:
+				if pipe.get(k) != id_value:
+					pipe.set(k, id_value)
+					pipe.set(f"transaction_{id_value}", id_value)
 			
 			pipe.multi()
+
+			db.delete(f"transaction_{id_value}")
+			for k in id_keys:
+				pipe.delete(k)
+			
 			for c in prepared_calls:
 				c(pipe)
 			
-		db.transaction(transaction_function, *transaction_keys)
+		db.transaction(transaction_function, id_value)
 
 
 

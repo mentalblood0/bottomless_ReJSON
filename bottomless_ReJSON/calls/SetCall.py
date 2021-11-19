@@ -4,14 +4,6 @@ from .. import RedisInterface
 
 
 class SetCall(Call):
-
-	@property
-	def root_key(self):
-		return self.args[0]
-
-	@property
-	def path(self):
-		return self.args[1]
 	
 	@property
 	def value(self):
