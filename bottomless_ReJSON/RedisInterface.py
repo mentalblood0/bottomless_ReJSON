@@ -155,11 +155,6 @@ class RedisInterface:
 
 		if not self.isIndexExists(field):
 			raise NotImplementedError(f"Index not exists: {self} {field}")
-			# return [
-			# 	self[k]
-			# 	for k in self.keys()
-			# 	if self[k][field] == value
-			# ]
 
 		index = self.getIndex(field)
 
