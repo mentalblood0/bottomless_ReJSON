@@ -21,8 +21,7 @@ class same(Benchmark):
 		self.interface['sessions'].createIndex('state')
 	
 	def clean(self, **kwargs):
-		self.interface.indexes.clear()
-		self.interface.clear()
+		self.interface.db.flushdb()
 
 
 class different(Benchmark):
@@ -30,8 +29,7 @@ class different(Benchmark):
 	def prepare(self, items_number):
 
 		self.interface = RedisInterface(host=config['db']['host'], port=config['db']['port'])
-		self.interface.indexes.clear()
-		self.interface.clear()
+		self.interface.db.flushdb()
 
 		self.interface['sessions'] = {
 			str(i): {'state': str(i)}
@@ -42,5 +40,4 @@ class different(Benchmark):
 		self.interface['sessions'].createIndex('state')
 	
 	def clean(self, **kwargs):
-		self.interface.indexes.clear()
-		self.interface.clear()
+		self.interface.db.flushdb()

@@ -5,7 +5,7 @@
             "index",
             "json"
         ],
-		"items_number": 100
+		"items_number": 1000
 	},
     "createIndex::different": {
 		"__n__": 1,
@@ -13,7 +13,7 @@
             "index",
             "json"
         ],
-		"items_number": 100
+		"items_number": 1000
 	},
     "clear::without_index": {
 		"__n__": 1,
@@ -21,6 +21,22 @@
             "index",
             "json"
         ],
-		"items_number": 100
+		"items_number": 1000
+	},
+    "set::without_index": {
+		"__n__": 1,
+        "__calls__": [
+            "index",
+            "json"
+        ],
+		"items_number": 1000
+	},
+    "get::without_index": {
+		"__n__": 1,
+        "__calls__": [
+            "index",
+            "json"
+        ],
+		"items_number": 1000
 	}
 }
