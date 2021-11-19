@@ -114,7 +114,6 @@ class RedisInterface:
 
 	def isIndexExists(self, field):
 		return isIndexExists(composeRejsonPath(self.path + ['__index__', field]), self.db)
-		return self.getIndex(field).type == 'object'
 	
 	def addToIndex(self, field, temp=None, value=None):
 		
@@ -134,8 +133,8 @@ class RedisInterface:
 	
 	def removeFromIndex(self, field, temp=None):
 
-		if self[field].type in ['object', 'array']:
-			return False
+		# if self[field].type in ['object', 'array']:
+		# 	return False
 
 		if not self.parent or not self.parent.isIndexExists(field):
 			return False
@@ -169,8 +168,9 @@ class RedisInterface:
 		if not hasattr(self, 'indexes'):
 			return
 		
-		if self.type == 'object':
-			for k in self.keys():
+		keys = self.keys()
+		if keys:
+			for k in keys:
 				self[k].removeFromIndexes(temp)
 		else:
 			if self.parent:
