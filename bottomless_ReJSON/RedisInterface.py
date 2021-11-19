@@ -85,10 +85,10 @@ class RedisInterface:
 			return False
 
 		if value == None:
-
 			value = self[field]()
-			if value == None:
-				return False
+		
+		if (value == None) or (type(value) in [dict, list]):
+			return False
 		
 		index = self.parent.getIndex(field)
 		(index[value][self.path[-1]]).set(True, temp)
@@ -97,18 +97,23 @@ class RedisInterface:
 	
 	def removeFromIndex(self, field, temp=None):
 
+		if self[field].type in ['object', 'array']:
+			return False
+
 		if not self.parent or not self.parent.isIndexExists(field):
 			return False
 		
 		index = self.parent.getIndex(field)
-		
+
 		value = self[field]()
-		if not value:
-			return
+		if (value == None) or (type(value) in [dict, list]):
+			return False
 		
 		index[value].__delitem__(self.path[-1], temp)
 		if not len(index[value]):
 			index.__delitem__(value, temp)
+		
+		return True
 	
 	def addToIndexes(self, payload, temp=None):
 
