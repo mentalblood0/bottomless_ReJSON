@@ -80,9 +80,6 @@ class RedisInterface:
 		return self.getIndex(field).type == 'object'
 	
 	def addToIndex(self, field, temp=None, value=None):
-
-		if not self.parent:
-			return False
 		
 		if not self.parent or not self.parent.isIndexExists(field):
 			return False
@@ -90,7 +87,7 @@ class RedisInterface:
 		if value == None:
 
 			value = self[field]()
-			if not value:
+			if value == None:
 				return False
 		
 		index = self.parent.getIndex(field)
