@@ -152,19 +152,20 @@ class Calls(list):
 					k: id_value
 					for k in id_keys
 				})
-			for k in id_keys:
-				if pipe.get(k) != id_value:
-					pipe.set(k, id_value)
-					pipe.set(transaction_key, id_value)
+			
+			def subtransaction_function(sub_pipe):
+			
+				sub_pipe.multi()
+
+				db.delete(transaction_key)
+				for k in id_keys:
+					sub_pipe.delete(k)
+				
+				for c in prepared_calls:
+					c(sub_pipe)
 			
 			pipe.multi()
-
-			db.delete(transaction_key)
-			for k in id_keys:
-				pipe.delete(k)
-			
-			for c in prepared_calls:
-				c(pipe)
+			db.transaction(subtransaction_function, *id_keys)
 			
 		db.transaction(transaction_function, transaction_key)
 
