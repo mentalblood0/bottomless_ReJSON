@@ -87,7 +87,7 @@ class RedisInterface:
 	
 	@property
 	def _path(self):
-		return Path(self.ReJSON_path)
+		return self.ReJSON_path
 	
 	def keys(self):
 

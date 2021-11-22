@@ -1,11 +1,11 @@
 import uuid
 import json
+from rejson import Client
 from flatten_dict import flatten
 
-from . import Call
 from .calls import *
 from .common import *
-
+from . import Call, makeCaching
 
 
 def joinDicts(*args):
@@ -125,9 +125,26 @@ class Calls(list):
 		id_value = uuid.uuid4().hex
 		transaction_key = f"transaction_{id_value}"
 
+		host = db.connection_pool.connection_kwargs['host']
+		port = db.connection_pool.connection_kwargs['port']
+		db_caching = Client(host=host, port=port, decode_responses=True)
+		makeCaching(
+			db_caching, [
+				'jsonget', 
+				'jsonmget',
+				'jsontype',
+				'jsonobjkeys',
+				'jsonarrindex',
+				'jsonarrlen',
+				'jsonobjlen',
+				'jsonstrlen'
+			]
+		)
+
 		def transaction_function(pipe):
 
-			prepared_calls = self.getPrepared(db)
+			db_caching._cache = {}
+			prepared_calls = self.getPrepared(db_caching)
 
 			id_keys = [f"transaction_{c.root_key}{composeRejsonPath(c.path)}" for c in prepared_calls]
 			for k in id_keys:

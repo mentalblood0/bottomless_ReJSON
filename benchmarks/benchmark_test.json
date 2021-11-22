@@ -1,13 +1,11 @@
 {
     "clear::without_index": {
-		
-        "items_number": 10,
-		
-        "__n__": 10,
+		"__n__": 1,
         "__calls__": [
             "index",
-            "json"
-        ]
-	
-    }
+            "json",
+            "dumps"
+        ],
+		"items_number": 1000
+	}
 }
