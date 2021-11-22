@@ -1,6 +1,7 @@
 import uuid
 import json
 from rejson import Client
+from redis import WatchError
 from flatten_dict import flatten
 
 from .calls import *
@@ -123,7 +124,6 @@ class Calls(list):
 	def __call__(self, db):
 
 		id_value = uuid.uuid4().hex
-		transaction_key = f"transaction_{id_value}"
 
 		host = db.connection_pool.connection_kwargs['host']
 		port = db.connection_pool.connection_kwargs['port']
@@ -141,33 +141,48 @@ class Calls(list):
 			]
 		)
 
-		def transaction_function(pipe):
+		while True:
 
-			db_caching._cache = {}
-			prepared_calls = self.getPrepared(db_caching)
-
-			id_keys = [f"transaction_{c.root_key}{composeRejsonPath(c.path)}" for c in prepared_calls]
-			if id_keys:
-				pipe.mset({
-					k: id_value
-					for k in id_keys
-				})
-			
-			def subtransaction_function(sub_pipe):
-			
-				sub_pipe.multi()
-
-				db.delete(transaction_key)
-				for k in id_keys:
-					sub_pipe.delete(k)
+			try:
 				
-				for c in prepared_calls:
-					c(sub_pipe)
-			
-			pipe.multi()
-			db.transaction(subtransaction_function, *id_keys)
-			
-		db.transaction(transaction_function, transaction_key)
+				db_caching._cache = {}
+				prepared_calls = self.getPrepared(db_caching)
+
+				id_keys = [f"transaction_{c.root_key}{composeRejsonPath(c.path)}" for c in prepared_calls]
+				if id_keys:
+					db.mset({
+						k: id_value
+						for k in id_keys
+					})
+
+				if len(id_keys):
+					
+					sub_pipe = db.pipeline()
+					while True:
+						try:
+							sub_pipe.watch(*id_keys)
+							sub_pipe.multi()
+							for c in prepared_calls:
+								c(sub_pipe)
+							sub_pipe.execute()
+							db.delete(*id_keys)
+							break
+						except WatchError:
+							raise
+						finally:
+							sub_pipe.reset()
+					
+				else:
+					
+					for c in prepared_calls:
+						pipe = db.pipeline()
+						c(pipe)
+						pipe.execute()
+
+				break
+
+			except WatchError:
+				continue
 
 
 
