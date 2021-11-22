@@ -111,8 +111,29 @@ class RedisInterface:
 	
 	def getIndex(self, field):
 		return (self.indexes + self)['__index__'][field]
+	
+	def getAllIndexes(self):
+		
+		result = [self.indexes]
+
+		while True:
+			result = [
+				e 
+				for r in result
+				for e in list(r)
+				if not '__index__' in r.path
+			]
+			if all(['__index__' in e.path for e in result]):
+				break
+		
+		return [
+			e.path[:-2] + [e.path[-1]]
+			for r in result
+			for e in list(r)
+		]
 
 	def isIndexExists(self, field):
+		return (self.path + [field]) in self.getAllIndexes()
 		return isIndexExists(composeRejsonPath(self.path + ['__index__', field]), self.db)
 	
 	def addToIndex(self, field, temp=None, value=None):

@@ -31,7 +31,7 @@
         ],
 		"items_number": 1000
 	},
-    "get::without_index": {
+    "set::without_index": {
 		"__n__": 1,
         "__calls__": [
             "index",

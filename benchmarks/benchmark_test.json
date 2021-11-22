@@ -4,7 +4,8 @@
         "__calls__": [
             "index",
             "json",
-            "dumps"
+            "dumps",
+            "keys"
         ],
 		"items_number": 1000
 	}
