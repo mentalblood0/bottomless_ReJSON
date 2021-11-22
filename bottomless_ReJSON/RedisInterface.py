@@ -135,7 +135,6 @@ class RedisInterface:
 
 	def isIndexExists(self, field):
 		return (self.path + [field]) in self.getAllIndexes()
-		return isIndexExists(composeRejsonPath(self.path + ['__index__', field]), self.db)
 	
 	def addToIndex(self, field, temp=None, value=None):
 		
