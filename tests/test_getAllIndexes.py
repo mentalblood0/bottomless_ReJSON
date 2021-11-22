@@ -9,6 +9,7 @@ def test_basic():
 
 	interface = RedisInterface(host=config['db']['host'], port=config['db']['port'])
 	interface.db.flushdb()
+	interface.use_indexes_cache = False
 
 	interface['sessions'] = {
 		'a': {'state': 'new'},

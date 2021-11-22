@@ -7,18 +7,34 @@ from .calls import *
 
 
 
-isIndexExists__use_cache = True
-isIndexExists__cache = {}
+getAllIndexes__use_cache = True
+getAllIndexes__cache = None
 
-def isIndexExists(path, db):
+def getAllIndexes(self):
 
-	if not isIndexExists__use_cache:
-		return db.jsontype('indexes', path) == 'object'
+	global getAllIndexes__cache
+
+	if (not getAllIndexes__use_cache) or (getAllIndexes__cache == None):
+
+		result = [self.indexes]
+
+		while True:
+			result = [
+				e 
+				for r in result
+				for e in list(r)
+				if not '__index__' in r.path
+			]
+			if all(['__index__' in e.path for e in result]):
+				break
+		
+		getAllIndexes__cache = [
+			e.path[:-2] + [e.path[-1]]
+			for r in result
+			for e in list(r)
+		]
 	
-	if not path in isIndexExists__cache:
-		isIndexExists__cache[path] = (db.jsontype('indexes', path) == 'object')
-	
-	return isIndexExists__cache[path]
+	return getAllIndexes__cache
 
 
 class RedisInterface:
@@ -62,17 +78,17 @@ class RedisInterface:
 	
 	@property
 	def use_indexes_cache(self):
-		return isIndexExists__use_cache
+		return getAllIndexes__use_cache
 	
 	@use_indexes_cache.setter
 	def use_indexes_cache(self, value: bool):
 		
 		if value == False:
-			global isIndexExists__cache
-			isIndexExists__cache = {}
+			global getAllIndexes__cache
+			getAllIndexes__cache = None
 		
-		global isIndexExists__use_cache
-		isIndexExists__use_cache = value
+		global getAllIndexes__use_cache
+		getAllIndexes__use_cache = value
 	
 	@property
 	def parent(self):
@@ -113,24 +129,7 @@ class RedisInterface:
 		return (self.indexes + self)['__index__'][field]
 	
 	def getAllIndexes(self):
-		
-		result = [self.indexes]
-
-		while True:
-			result = [
-				e 
-				for r in result
-				for e in list(r)
-				if not '__index__' in r.path
-			]
-			if all(['__index__' in e.path for e in result]):
-				break
-		
-		return [
-			e.path[:-2] + [e.path[-1]]
-			for r in result
-			for e in list(r)
-		]
+		return getAllIndexes(self)
 
 	def isIndexExists(self, field):
 		return (self.path + [field]) in self.getAllIndexes()
