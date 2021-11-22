@@ -139,6 +139,35 @@ def test_remove_complex():
 	assert interface['sessions'].filter('state', 'erroneous') == []
 
 
+def test_update_value():
+
+	interface = RedisInterface(host=config['db']['host'], port=config['db']['port'])
+	interface.db.flushdb()
+	interface.use_indexes_cache = False
+	interface.use_indexes_cache = True
+
+	interface['sessions'].createIndex('state')
+	interface.use_indexes_cache = False
+	interface.use_indexes_cache = True
+
+	interface['sessions'] = {
+		'a': {'state': 'new'}
+	}
+
+	interface['sessions']['a']['state'] = 'processed'
+	assert interface['sessions'].filter('state', 'new') == []
+	assert interface['sessions'].filter('state', 'processed') == [
+		interface['sessions']['a']
+	]
+
+	interface['sessions']['a']['state'] = 'finished'
+	assert interface['sessions'].filter('state', 'new') == []
+	assert interface['sessions'].filter('state', 'processed') == []
+	assert interface['sessions'].filter('state', 'finished') == [
+		interface['sessions']['a']
+	]
+
+
 def test_update():
 
 	interface = RedisInterface(host=config['db']['host'], port=config['db']['port'])

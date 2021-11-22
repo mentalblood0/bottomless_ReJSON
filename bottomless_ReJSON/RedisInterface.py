@@ -83,9 +83,11 @@ class RedisInterface:
 	@use_indexes_cache.setter
 	def use_indexes_cache(self, value: bool):
 		
+		global getAllIndexes__cache
 		if value == False:
-			global getAllIndexes__cache
 			getAllIndexes__cache = None
+		else:
+			getAllIndexes__cache = self.getAllIndexes()
 		
 		global getAllIndexes__use_cache
 		getAllIndexes__use_cache = value
@@ -196,6 +198,7 @@ class RedisInterface:
 				index_path = i[:-1] + ['__index__', i[-1]]
 				# print(f"fits {i}, so SET {index_path} {{}}")
 				RedisInterface(self.db, index_path, root_key='indexes').set({})
+				return
 
 		if len(self.path) > 1:
 			
