@@ -221,15 +221,23 @@ class RedisInterface:
 				return
 		
 		if len(self.path) > 2:
-			paths = [
-				self.path[:-1],
-				self.path[:-2] + [self.path[-1]]
-			]
-			if not any([
-				any([path == e[:len(path)] for e in self.getAllIndexes()])
-				for path in paths
-			]):
-				return
+			path = self.path[:-2] + [self.path[-1]]
+			# print('path', path)
+			for i in self.getAllIndexes():
+				if path == i[:len(path)]:
+					index_path = path[:-1] + ['__index__', path[-1]]
+					index = RedisInterface(self.db, index_path, root_key='indexes')
+					for value in index:
+						value[self.path[-2]].clear(temp)
+					# print(i, index_path)
+		
+		# keys = self.keys()
+		# if keys:
+		# 	for k in keys:
+		# 		self[k].removeFromIndexes(temp)
+		# else:
+		# 	if self.parent:
+		# 		self.parent.removeFromIndex(self.path[-1], temp)
 	
 	def createIndex(self, field):
 

@@ -154,6 +154,7 @@ def test_update_value():
 		'a': {'state': 'new'}
 	}
 
+	print('update')
 	interface['sessions']['a']['state'] = 'processed'
 	assert interface['sessions'].filter('state', 'new') == []
 	assert interface['sessions'].filter('state', 'processed') == [
