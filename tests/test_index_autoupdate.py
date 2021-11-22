@@ -97,6 +97,9 @@ def test_remove_simple():
 		'e': {'state': 'erroneous'}
 	}
 
+	print(interface.indexes())
+	print(interface.getAllIndexes())
+	print('del')
 	del interface['sessions']['a']
 
 	assert interface.indexes['sessions']['__index__']['state']['new']['a']() == None
@@ -130,8 +133,7 @@ def test_remove_complex():
 
 	print('indexes', interface.indexes())
 
-	for state_value in ['new', 'processed', 'erroneous']:
-		assert interface.indexes['sessions']['__index__']['state'][state_value]() == {}
+	assert interface.indexes['sessions']['__index__']['state']() == {}
 	assert interface['sessions'].filter('state', 'new') == []
 	assert interface['sessions'].filter('state', 'processed') == []
 	assert interface['sessions'].filter('state', 'erroneous') == []
@@ -247,8 +249,9 @@ def test_clear():
 	print('interface', interface())
 	assert interface() == None
 
-	for state_value in ['new', 'processed', 'erroneous']:
-		assert interface.indexes['sessions']['__index__']['state'][state_value]() == {}
+	assert interface.indexes['sessions']['__index__']['state']() == {}
 	assert interface['sessions'].filter('state', 'new') == []
 	assert interface['sessions'].filter('state', 'processed') == []
 	assert interface['sessions'].filter('state', 'erroneous') == []
+
+	# assert False

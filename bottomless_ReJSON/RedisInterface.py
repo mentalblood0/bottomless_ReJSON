@@ -188,6 +188,35 @@ class RedisInterface:
 		if not hasattr(self, 'indexes'):
 			return
 		
+		# print('removeFromIndexes', self.path, self.getAllIndexes())
+
+		for i in self.getAllIndexes():
+
+			if self.path == i[:len(self.path)]:
+				index_path = i[:-1] + ['__index__', i[-1]]
+				# print(f"fits {i}, so SET {index_path} {{}}")
+				RedisInterface(self.db, index_path, root_key='indexes').set({})
+
+		if len(self.path) > 1:
+			
+			path = self.path[:-1]
+			keys_to_delete = []
+			
+			for i in self.getAllIndexes():
+			
+				if path == i[:len(path)]:
+			
+					value = self[i[-1]]()
+					# print('value', value)
+					if value != None:
+						index_path = i[:-1] + ['__index__', i[-1], value, self.path[-1]]
+						keys_to_delete.append(index_path)
+			
+			if keys_to_delete:
+				for path in keys_to_delete:
+					RedisInterface(self.db, path, root_key='indexes').clear(temp)
+				return
+		
 		if len(self.path) > 2:
 			paths = [
 				self.path[:-1],
@@ -198,14 +227,6 @@ class RedisInterface:
 				for path in paths
 			]):
 				return
-		
-		keys = self.keys()
-		if keys:
-			for k in keys:
-				self[k].removeFromIndexes(temp)
-		else:
-			if self.parent:
-				self.parent.removeFromIndex(self.path[-1], temp)
 	
 	def createIndex(self, field):
 
