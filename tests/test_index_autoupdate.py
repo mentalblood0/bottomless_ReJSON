@@ -104,7 +104,7 @@ def test_remove_simple():
 		interface['sessions']['c']
 	]
 
-	assert False
+	# assert False
 
 
 def test_remove_complex():
