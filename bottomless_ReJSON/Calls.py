@@ -147,6 +147,11 @@ class Calls(list):
 			prepared_calls = self.getPrepared(db_caching)
 
 			id_keys = [f"transaction_{c.root_key}{composeRejsonPath(c.path)}" for c in prepared_calls]
+			if id_keys:
+				pipe.mset({
+					k: id_value
+					for k in id_keys
+				})
 			for k in id_keys:
 				if pipe.get(k) != id_value:
 					pipe.set(k, id_value)

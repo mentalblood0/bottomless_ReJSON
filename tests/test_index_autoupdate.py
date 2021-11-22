@@ -97,13 +97,14 @@ def test_remove_simple():
 		'e': {'state': 'erroneous'}
 	}
 
-	print('del')
 	del interface['sessions']['a']
 
 	assert interface.indexes['sessions']['__index__']['state']['new']['a']() == None
 	assert interface['sessions'].filter('state', 'new') == [
 		interface['sessions']['c']
 	]
+
+	assert False
 
 
 def test_remove_complex():
