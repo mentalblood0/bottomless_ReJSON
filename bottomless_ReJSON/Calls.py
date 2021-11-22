@@ -157,20 +157,20 @@ class Calls(list):
 
 				if len(id_keys):
 					
-					sub_pipe = db.pipeline()
+					pipe = db.pipeline()
 					while True:
 						try:
-							sub_pipe.watch(*id_keys)
-							sub_pipe.multi()
+							pipe.watch(*id_keys)
+							pipe.multi()
 							for c in prepared_calls:
-								c(sub_pipe)
-							sub_pipe.execute()
+								c(pipe)
+							pipe.execute()
 							db.delete(*id_keys)
 							break
 						except WatchError:
 							raise
 						finally:
-							sub_pipe.reset()
+							pipe.reset()
 					
 				else:
 					

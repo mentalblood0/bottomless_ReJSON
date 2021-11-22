@@ -97,7 +97,7 @@ class RedisInterface:
 		if not self.path:
 			return None
 		else:
-			return RedisInterface(self.db, self.path[:-1], self.root_key, self.host, self.port)
+			return RedisInterface(self.db, self.path[:-1], self.root_key)
 	
 	@cached_property
 	def ReJSON_path(self):

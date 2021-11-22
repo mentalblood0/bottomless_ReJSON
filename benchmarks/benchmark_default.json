@@ -11,7 +11,8 @@
 		"__n__": 1,
         "__calls__": [
             "index",
-            "json"
+            "json",
+            "parent"
         ],
 		"items_number": 1000
 	},
