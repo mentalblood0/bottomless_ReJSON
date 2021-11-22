@@ -97,6 +97,7 @@ def test_remove_simple():
 		'e': {'state': 'erroneous'}
 	}
 
+	print('del')
 	del interface['sessions']['a']
 
 	assert interface.indexes['sessions']['__index__']['state']['new']['a']() == None
@@ -202,6 +203,8 @@ def test_update_complex():
 			'f': {'state': 'new'}
 		}
 	}
+
+	print(f"indexes: {interface.indexes()}")
 
 	assert interface.indexes['key']['sessions']['__index__']['state']['new']['a']() == None
 	assert interface.indexes['key']['sessions']['__index__']['state']['processed']['d']() == None

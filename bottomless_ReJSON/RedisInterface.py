@@ -188,6 +188,17 @@ class RedisInterface:
 		if not hasattr(self, 'indexes'):
 			return
 		
+		if len(self.path) > 2:
+			paths = [
+				self.path[:-1],
+				self.path[:-2] + [self.path[-1]]
+			]
+			if not any([
+				any([path == e[:len(path)] for e in self.getAllIndexes()])
+				for path in paths
+			]):
+				return
+		
 		keys = self.keys()
 		if keys:
 			for k in keys:
