@@ -147,6 +147,7 @@ class Calls(list):
 				
 				db_caching._cache = {}
 				prepared_calls = self.getPrepared(db_caching)
+				print('prepared_calls', json.dumps(prepared_calls, indent=4))
 
 				id_keys = [f"transaction_{c.root_key}{composeRejsonPath(c.path)}" for c in prepared_calls]
 				if id_keys:

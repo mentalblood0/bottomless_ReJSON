@@ -175,8 +175,10 @@ class RedisInterface:
 
 			if self.path == i[:len(self.path)]:
 				index_path = i[:-1] + ['__index__', i[-1]]
-				# print(f"fits {i}, so SET {index_path} {{}}")
-				RedisInterface(self.db, index_path, root_key='indexes').set({})
+				print(f"fits {i}, so SET {index_path} {{}}, interface is {self.indexes()}")
+				for value in RedisInterface(self.db, index_path, root_key='indexes'):
+					value.set({}, temp)
+				# RedisInterface(self.db, index_path, root_key='indexes').set({}, temp)
 				return
 
 		if len(self.path) > 1:
