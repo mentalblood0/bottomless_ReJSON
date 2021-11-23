@@ -223,10 +223,11 @@ class RedisInterface:
 		if self.isIndexExists(field):
 			return
 		
-		index = self.getIndex(field)
-		index.set({})
-
 		temp = Calls()
+		
+		index = self.getIndex(field)
+		index.set({}, temp)
+
 		for e in self:
 			e.addToIndex(field, temp)
 		
@@ -237,13 +238,9 @@ class RedisInterface:
 		if not self.isIndexExists(field):
 			raise NotImplementedError(f"Index not exists: {self} {field}")
 
-		index = self.getIndex(field)
-
-		keys = index[value]() or {}
-
 		return [
 			self[k]
-			for k in keys
+			for k in self.getIndex(field)[value].keys()
 		]
 
 	def set(self, value, temp=None):
@@ -301,8 +298,13 @@ class RedisInterface:
 			return self.db.jsonarrindex(self.root_key, self._path, key) != -1
 	
 	def update(self, other: dict):
+
+		temp = Calls()
+
 		for key, value in other.items():
-			self[key].set(value)
+			self[key].set(value, temp)
+		
+		temp(self.db)
 	
 	def __ior__(self, other: dict): # |=
 		self.update(other)
