@@ -1,3 +1,4 @@
+import json
 import pytest
 
 from tests import config
@@ -36,3 +37,26 @@ def test_cascade():
 	del interface['2']
 
 	assert interface['2'] == None
+
+
+def test_with_indexes():
+
+	interface = RedisInterface(host=config['db']['host'], port=config['db']['port'])
+	interface.db.flushdb()
+
+	with open('tests/test_delete_db.json') as f:
+		db = json.load(f)
+	interface.set(db)
+
+	with open('tests/test_delete_db_indexes.json') as f:
+		indexes = json.load(f)
+	interface.indexes.set(indexes)
+
+	assert interface == db
+	assert interface.indexes == indexes
+
+	interface.clear()
+
+	assert interface == None
+	print(interface.indexes())
+	assert interface.indexes == None
