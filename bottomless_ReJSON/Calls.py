@@ -150,39 +150,35 @@ class Calls(list):
 				
 				db_caching._cache = {}
 				prepared_calls = prepared_calls or self.getPrepared(db_caching)
-				id_keys = id_keys or [f"transaction_{c.root_key}{composeRejsonPath(c.path)}" for c in prepared_calls]
+				id_keys = [f"transaction_{c.root_key}{composeRejsonPath(c.path)}" for c in prepared_calls]
 				
 				if len(id_keys):
 					
 					pipe = db.pipeline()
-					while True:
-						try:
-							pipe.watch(*id_keys)
-							db_caching._cache = {}
-							again_prepared_calls = self.getPrepared(db_caching)
-							if again_prepared_calls != prepared_calls:
-								prepared_calls = again_prepared_calls
-								id_keys = [f"transaction_{c.root_key}{composeRejsonPath(c.path)}" for c in prepared_calls]
-								raise WatchError
-							pipe.multi()
-							pipe.mset({
-								k: id_value
-								for k in id_keys
-							})
-							for c in prepared_calls:
-								c(pipe)
-							pipe.execute()
-							db.delete(*id_keys)
-							break
-						except WatchError:
-							raise
-						finally:
-							pipe.reset()
-
-				break
+					pipe.watch(*id_keys)
+					
+					db_caching._cache = {}
+					again_prepared_calls = self.getPrepared(db_caching)
+					if again_prepared_calls != prepared_calls:
+						prepared_calls = again_prepared_calls
+						raise WatchError
+					
+					pipe.multi()
+					
+					pipe.mset({
+						k: id_value
+						for k in id_keys
+					})
+					for c in prepared_calls:
+						c(pipe)
+					
+					pipe.execute()
+					db.delete(*id_keys)
 
 			except WatchError:
 				continue
+			
+			break
 
 
 
