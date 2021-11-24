@@ -60,7 +60,7 @@ def test_add():
 		interface.set(value)
 		results['long_set'] += 1
 	
-	n = 1 * 10 ** 2
+	n = 1 * 10 ** 1
 	value = {
 		"id": "35302f1ef45e42beae445d96ab5a5fb8",
 		"name": "test_session",
@@ -83,7 +83,8 @@ def test_add():
 		s.start()
 		# s.join()
 	
-	while not results['long_set'] == n:
+	while not (results['long_set'] == n):
 		sleep(0.1)
 	
+	print(interface['sessions']())
 	assert len(interface['sessions']) == n

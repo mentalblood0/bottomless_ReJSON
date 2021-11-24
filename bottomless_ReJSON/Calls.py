@@ -125,6 +125,8 @@ class Calls(list):
 	def __call__(self, db):
 
 		id_value = uuid.uuid4().hex
+		logger.add(f"log/{id_value}", filter=lambda r: id_value in r['extra'])
+		local_logger = logger.bind(**{id_value: True})
 
 		host = db.connection_pool.connection_kwargs['host']
 		port = db.connection_pool.connection_kwargs['port']
@@ -142,20 +144,17 @@ class Calls(list):
 			]
 		)
 
+		prepared_calls = None
+		id_keys = None
+
 		while True:
 
 			try:
 				
 				db_caching._cache = {}
 				prepared_calls = self.getPrepared(db_caching)
-				# logger.warning(f"prepared_calls {json.dumps(prepared_calls, indent=4)}")
-
 				id_keys = [f"transaction_{c.root_key}{composeRejsonPath(c.path)}" for c in prepared_calls]
-				if id_keys:
-					db.mset({
-						k: id_value
-						for k in id_keys
-					})
+				local_logger.warning(f"prepared_calls {json.dumps(prepared_calls, indent=4)}\nid_keys: {json.dumps(id_keys, indent=4)}")
 
 				if len(id_keys):
 					
@@ -164,10 +163,15 @@ class Calls(list):
 						try:
 							pipe.watch(*id_keys)
 							pipe.multi()
+							if id_keys:
+								pipe.mset({
+									k: id_value
+									for k in id_keys
+								})
 							for c in prepared_calls:
 								c(pipe)
 							pipe.execute()
-							db.delete(*id_keys)
+							# db.delete(*id_keys)
 							break
 						except WatchError:
 							raise
@@ -176,15 +180,18 @@ class Calls(list):
 					
 				else:
 					
+					pipe = db.pipeline()
 					for c in prepared_calls:
-						pipe = db.pipeline()
 						c(pipe)
-						pipe.execute()
+					pipe.execute()
 
 				break
 
 			except WatchError:
+				local_logger.warning('WATCH ERROR')
 				continue
+		
+		local_logger.warning(f"FINAL prepared_calls {json.dumps(prepared_calls, indent=4)}\nid_keys: {json.dumps(id_keys, indent=4)}")
 
 
 
