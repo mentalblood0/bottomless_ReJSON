@@ -150,9 +150,10 @@ class Calls(list):
 				
 				db_caching._cache = {}
 				prepared_calls = prepared_calls or self.getPrepared(db_caching)
-				id_keys = [f"transaction_{c.root_key}{composeRejsonPath(c.path)}" for c in prepared_calls]
 				
-				if len(id_keys):
+				if len(prepared_calls):
+					
+					id_keys = [f"transaction_{c.root_key}{composeRejsonPath(c.path)}" for c in prepared_calls]
 					
 					pipe = db.pipeline()
 					pipe.watch(*id_keys)

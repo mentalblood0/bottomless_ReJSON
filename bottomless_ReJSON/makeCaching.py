@@ -2,6 +2,14 @@ import json
 
 
 
+def getFromCache(object, name, key):
+	return object._cache[name][key]
+
+
+def addToCache(object, name, key, value):
+	object._cache[name][key] = value
+
+
 def getCached(object, method):
 
 	name = method.__name__
@@ -13,9 +21,12 @@ def getCached(object, method):
 		
 		key = json.dumps([args, kwargs])
 		if not key in object._cache[name]:
-			object._cache[name][key] = method(*args, **kwargs)
+			result = method(*args, **kwargs)
+			addToCache(object, name, key, result)
+		else:
+			result = getFromCache(object, name, key)
 		
-		return object._cache[name][key]
+		return result
 
 	return cached
 

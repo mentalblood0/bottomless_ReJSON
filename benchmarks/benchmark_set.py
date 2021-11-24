@@ -20,3 +20,23 @@ class without_index(Benchmark):
 	
 	def clean(self, **kwargs):
 		self.interface.db.flushdb()
+
+
+class with_index(Benchmark):
+
+	def prepare(self, **kwargs):
+
+		self.interface = RedisInterface(host=config['db']['host'], port=config['db']['port'])
+		self.interface.db.flushdb()
+		self.interface['sessions'].createIndex('state')
+		self.interface.use_indexes_cache = False
+		self.interface.use_indexes_cache = True
+
+	def run(self, items_number):
+		self.interface['sessions'] = {
+			str(i): {'state': 'new'}
+			for i in range(items_number)
+		}
+	
+	def clean(self, **kwargs):
+		self.interface.db.flushdb()

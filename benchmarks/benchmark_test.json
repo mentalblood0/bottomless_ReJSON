@@ -1,12 +1,17 @@
 {
-    "clear::without_index": {
+
+    "set::with_index": {
 		"__n__": 1,
         "__calls__": [
             "index",
             "json",
-            "dumps",
-            "keys"
+            "getPrepared",
+            "getCorrect",
+            "getAdditionalCalls",
+            "getFromCache",
+            "addToCache"
         ],
 		"items_number": 1000
 	}
+
 }

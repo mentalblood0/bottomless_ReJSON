@@ -89,7 +89,7 @@ class RedisInterface:
 		global getAllIndexes__use_cache
 		getAllIndexes__use_cache = value
 	
-	@property
+	@cached_property
 	def parent(self):
 		return None if not self.path else RedisInterface(self.db, self.path[:-1], self.root_key)
 	
@@ -116,7 +116,7 @@ class RedisInterface:
 	
 	def __getitem__(self, key):
 		return RedisInterface(self.db, self.path + [key], root_key=self.root_key)
-	
+
 	def getIndex(self, field):
 		return (self.indexes + self)['__index__'][field]
 	
