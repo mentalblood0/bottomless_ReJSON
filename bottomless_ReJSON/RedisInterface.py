@@ -1,9 +1,9 @@
-from rejson import Client, Path
+from rejson import Client
 from functools import cached_property
 
 from . import Calls
-from .common import *
 from .calls import *
+from .common import *
 
 
 
@@ -168,17 +168,13 @@ class RedisInterface:
 		
 		if not hasattr(self, 'indexes'):
 			return
-		
-		# print('removeFromIndexes', self.path, self.getAllIndexes())
 
 		for i in self.getAllIndexes():
 
 			if self.path == i[:len(self.path)]:
 				index_path = i[:-1] + ['__index__', i[-1]]
-				# print(f"fits {i}, so SET {index_path} {{}}, interface is {self.indexes()}")
 				for value in RedisInterface(self.db, index_path, root_key='indexes'):
 					value.set({}, temp)
-				# RedisInterface(self.db, index_path, root_key='indexes').set({}, temp)
 				return
 
 		if len(self.path) > 1:
@@ -191,7 +187,6 @@ class RedisInterface:
 				if path == i[:len(path)]:
 			
 					value = self[i[-1]]()
-					# print('value', value)
 					if value != None:
 						index_path = i[:-1] + ['__index__', i[-1], value, self.path[-1]]
 						keys_to_delete.append(index_path)
@@ -203,22 +198,12 @@ class RedisInterface:
 		
 		if len(self.path) > 2:
 			path = self.path[:-2] + [self.path[-1]]
-			# print('path', path)
 			for i in self.getAllIndexes():
 				if path == i[:len(path)]:
 					index_path = path[:-1] + ['__index__', path[-1]]
 					index = RedisInterface(self.db, index_path, root_key='indexes')
 					for value in index:
 						value[self.path[-2]].clear(temp)
-					# print(i, index_path)
-		
-		# keys = self.keys()
-		# if keys:
-		# 	for k in keys:
-		# 		self[k].removeFromIndexes(temp)
-		# else:
-		# 	if self.parent:
-		# 		self.parent.removeFromIndex(self.path[-1], temp)
 	
 	def createIndex(self, field):
 
@@ -294,7 +279,7 @@ class RedisInterface:
 		t = self.type
 		
 		if t == 'object':
-			return str(key) in self.db.jsonobjkeys(self.root_key, self._path)
+			return self[str(key)].type != None
 		
 		elif t == 'array':
 			return self.db.jsonarrindex(self.root_key, self._path, key) != -1

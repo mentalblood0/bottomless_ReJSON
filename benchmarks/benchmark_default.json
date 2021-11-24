@@ -31,5 +31,13 @@
             "json"
         ],
 		"items_number": 1000
-	}
+	},
+    "contains::in_object": {
+        "__n__": 1,
+        "__calls__": [
+            "index",
+            "json"
+        ],
+		"items_number": 10000
+    }
 }

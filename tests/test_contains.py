@@ -5,7 +5,7 @@ import bottomless_ReJSON.RedisInterface as RedisInterface
 
 
 
-def test_basic():
+def test_object():
 
 	interface = RedisInterface(host=config['db']['host'], port=config['db']['port'])
 	interface.db.flushdb()
@@ -28,3 +28,23 @@ def test_basic():
 	
 	assert 2 in interface['sessions']
 	assert '2' in interface['sessions']
+
+
+def test_array():
+
+	interface = RedisInterface(host=config['db']['host'], port=config['db']['port'])
+	interface.db.flushdb()
+
+	interface.set([
+		[
+			[
+				'zero.zero.zero'
+			],
+			[
+				'zero.one.zero'
+			]
+		]
+	])
+
+	assert 'zero.zero.zero' in interface[0][0]
+	assert 'zero.one.zero' in interface[0][1]
