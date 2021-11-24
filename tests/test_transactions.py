@@ -1,12 +1,51 @@
 import pytest
-import shutil
 from time import sleep
-from redis import Redis
 from threading import Thread
 
 from tests import config
 import bottomless_ReJSON.RedisInterface as RedisInterface
 
+
+
+def test_interrupt():
+
+	interface = RedisInterface(host=config['db']['host'], port=config['db']['port'])
+	interface.db.flushdb()
+
+	db = interface.db
+
+	key = 'default'
+	value = uuid.uuid4().hex
+
+	def transaction_function(pipe):
+
+		if pipe.get(key) != value:
+			pipe.set(key, value)
+		
+		pipe.multi()
+		pipe.jsonset('root', '.', {'a': 1})
+	
+	db.transaction(transaction_function, key)
+	assert db.get(key) == value
+
+
+def test_delete_after_multi():
+
+	interface = RedisInterface(host=config['db']['host'], port=config['db']['port'])
+	interface.db.flushdb()
+
+	db = interface.db
+
+	key = 'default'
+
+	db.set('del', 'lalala')
+
+	def transaction_function(pipe):
+		pipe.multi()
+		pipe.delete('del')
+	
+	db.transaction(transaction_function, key)
+	assert db.get('del') == None
 
 
 def test_update():
@@ -52,8 +91,6 @@ def test_update():
 
 def test_add():
 
-	shutil.rmtree('log', ignore_errors=True)
-
 	interface = RedisInterface(host=config['db']['host'], port=config['db']['port'])
 	interface.db.flushdb()
 
@@ -63,7 +100,7 @@ def test_add():
 		interface.set(value)
 		results['long_set'] += 1
 	
-	n = 1 * 10 ** 4
+	n = 1 * 10 ** 3
 	value = {
 		"id": "35302f1ef45e42beae445d96ab5a5fb8",
 		"name": "test_session",

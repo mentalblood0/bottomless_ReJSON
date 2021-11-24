@@ -51,12 +51,18 @@ def test_with_indexes():
 	with open('tests/test_delete_db_indexes.json') as f:
 		indexes = json.load(f)
 	interface.indexes.set(indexes)
+	
+	interface.use_indexes_cache = False
+	interface.use_indexes_cache = True
 
 	assert interface == db
 	assert interface.indexes == indexes
+	sessions_ids = set(interface['sessions'].keys())
+	sessions_ids_in_index = set(interface.indexes['sessions']['__index__']['state']['finished'].keys())
+	assert sessions_ids == sessions_ids_in_index
 
 	interface.clear()
 
 	assert interface == None
 	print(interface.indexes())
-	assert interface.indexes == None
+	assert interface.indexes == {'sessions': {'__index__': {'state': {'new': {}, 'selected': {}, 'finished': {}}}}}
