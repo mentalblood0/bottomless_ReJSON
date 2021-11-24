@@ -1,4 +1,5 @@
 import pytest
+import shutil
 from time import sleep
 from redis import Redis
 from threading import Thread
@@ -51,6 +52,8 @@ def test_update():
 
 def test_add():
 
+	shutil.rmtree('log', ignore_errors=True)
+
 	interface = RedisInterface(host=config['db']['host'], port=config['db']['port'])
 	interface.db.flushdb()
 
@@ -60,7 +63,7 @@ def test_add():
 		interface.set(value)
 		results['long_set'] += 1
 	
-	n = 1 * 10 ** 1
+	n = 1 * 10 ** 3
 	value = {
 		"id": "35302f1ef45e42beae445d96ab5a5fb8",
 		"name": "test_session",
@@ -86,5 +89,5 @@ def test_add():
 	while not (results['long_set'] == n):
 		sleep(0.1)
 	
-	print(interface['sessions']())
+	# print(interface['sessions']())
 	assert len(interface['sessions']) == n

@@ -124,10 +124,6 @@ class Calls(list):
 	
 	def __call__(self, db):
 
-		id_value = uuid.uuid4().hex
-		logger.add(f"log/{id_value}", filter=lambda r: id_value in r['extra'])
-		local_logger = logger.bind(**{id_value: True})
-
 		host = db.connection_pool.connection_kwargs['host']
 		port = db.connection_pool.connection_kwargs['port']
 		db_caching = Client(host=host, port=port, decode_responses=True)
@@ -146,6 +142,7 @@ class Calls(list):
 
 		prepared_calls = None
 		id_keys = None
+		id_value = uuid.uuid4().hex
 
 		while True:
 
@@ -154,44 +151,35 @@ class Calls(list):
 				db_caching._cache = {}
 				prepared_calls = self.getPrepared(db_caching)
 				id_keys = [f"transaction_{c.root_key}{composeRejsonPath(c.path)}" for c in prepared_calls]
-				local_logger.warning(f"prepared_calls {json.dumps(prepared_calls, indent=4)}\nid_keys: {json.dumps(id_keys, indent=4)}")
-
+				
 				if len(id_keys):
 					
 					pipe = db.pipeline()
 					while True:
 						try:
 							pipe.watch(*id_keys)
+							db_caching._cache = {}
+							if self.getPrepared(db_caching) != prepared_calls:
+								raise WatchError
 							pipe.multi()
-							if id_keys:
-								pipe.mset({
-									k: id_value
-									for k in id_keys
-								})
+							pipe.mset({
+								k: id_value
+								for k in id_keys
+							})
 							for c in prepared_calls:
 								c(pipe)
 							pipe.execute()
-							# db.delete(*id_keys)
+							db.delete(*id_keys)
 							break
 						except WatchError:
 							raise
 						finally:
 							pipe.reset()
-					
-				else:
-					
-					pipe = db.pipeline()
-					for c in prepared_calls:
-						c(pipe)
-					pipe.execute()
 
 				break
 
 			except WatchError:
-				local_logger.warning('WATCH ERROR')
 				continue
-		
-		local_logger.warning(f"FINAL prepared_calls {json.dumps(prepared_calls, indent=4)}\nid_keys: {json.dumps(id_keys, indent=4)}")
 
 
 
