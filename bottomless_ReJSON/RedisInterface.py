@@ -84,28 +84,18 @@ class RedisInterface:
 	def use_indexes_cache(self, value: bool):
 		
 		global getAllIndexes__cache
-		if value == False:
-			getAllIndexes__cache = None
-		else:
-			getAllIndexes__cache = self.getAllIndexes()
+		getAllIndexes__cache = None if not value else getAllIndexes(self)
 		
 		global getAllIndexes__use_cache
 		getAllIndexes__use_cache = value
 	
 	@property
 	def parent(self):
-		if not self.path:
-			return None
-		else:
-			return RedisInterface(self.db, self.path[:-1], self.root_key)
+		return None if not self.path else RedisInterface(self.db, self.path[:-1], self.root_key)
 	
 	@cached_property
-	def ReJSON_path(self):
-		return composeRejsonPath(self.path)
-	
-	@property
 	def _path(self):
-		return self.ReJSON_path
+		return composeRejsonPath(self.path)
 	
 	def keys(self):
 
@@ -212,9 +202,7 @@ class RedisInterface:
 		
 		temp = Calls()
 		
-		index = self.getIndex(field)
-		index.set({}, temp)
-
+		self.getIndex(field).set({}, temp)
 		for e in self:
 			e.addToIndex(field, temp)
 		
@@ -240,11 +228,8 @@ class RedisInterface:
 			Calls([new_call])(self.db)
 
 	def __setitem__(self, key, value):
-
-		if isinstance(value, RedisInterface):
-			return
-
-		self[key].set(value)
+		if not isinstance(value, RedisInterface):
+			self[key].set(value)
 	
 	def clear(self, temp=None):
 
@@ -314,9 +299,7 @@ class RedisInterface:
 		self.db.jsonarrappend(self.root_key, self._path, value)
 	
 	def __iadd__(self, other: list): # +=
-		
 		self.db.jsonarrappend(self.root_key, self._path, *other)
-		
 		return self
 	
 	def __add__(self, other):
@@ -329,11 +312,11 @@ class RedisInterface:
 		return RedisInterface(self.db, self.path + other_path, root_key=self.root_key)
 	
 	def __iter__(self):
-		for k in sorted(self.keys()):
+		for k in self.keys():
 			yield self[k]
 
 	def __repr__(self):
-		return f"<{self.__class__.__name__} root_key=\"{self.root_key}\" path=\"{self.ReJSON_path}\">"
+		return f'<{self.__class__.__name__} root_key="{self.root_key}" path="{self._path}">'
 	
 	def __bool__(self):
 		return True

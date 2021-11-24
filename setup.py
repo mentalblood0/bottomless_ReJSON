@@ -12,7 +12,7 @@ if __name__ == '__main__':
 
 	setup(
 		name='bottomless_ReJSON',
-		version='0.8',
+		version='0.9',
 		description='Correct Redis Library',
 		long_description=long_description,
 		long_description_content_type='text/markdown',

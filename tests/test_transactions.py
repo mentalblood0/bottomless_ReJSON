@@ -54,13 +54,15 @@ def test_update():
 	interface = RedisInterface(host=config['db']['host'], port=config['db']['port'])
 	interface.db.flushdb()
 
-	results = {'long_get': None}
+	results = {'long_set': False, 'long_get': None}
 
 	def long_set(interface, key, value):
 		interface[key] = value
+		results['long_set'] = True
 	
 	def long_get(interface, key, valid_key, results):
-		sleep(1)
+		while not results['long_set']:
+			sleep(0.1)
 		print(interface(), interface[key](), valid_key)
 		results['long_get'] = (interface[key]() == valid_key)
 	
@@ -101,7 +103,7 @@ def test_add():
 		interface.set(value)
 		results['long_set'] += 1
 	
-	n = 1 * 10 ** 3
+	n = 1 * 10 ** 2
 	value = {
 		"id": "35302f1ef45e42beae445d96ab5a5fb8",
 		"name": "test_session",
