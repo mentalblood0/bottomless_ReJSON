@@ -149,8 +149,8 @@ class Calls(list):
 			try:
 				
 				db_caching._cache = {}
-				prepared_calls = self.getPrepared(db_caching)
-				id_keys = [f"transaction_{c.root_key}{composeRejsonPath(c.path)}" for c in prepared_calls]
+				prepared_calls = prepared_calls or self.getPrepared(db_caching)
+				id_keys = id_keys or [f"transaction_{c.root_key}{composeRejsonPath(c.path)}" for c in prepared_calls]
 				
 				if len(id_keys):
 					
@@ -159,7 +159,10 @@ class Calls(list):
 						try:
 							pipe.watch(*id_keys)
 							db_caching._cache = {}
-							if self.getPrepared(db_caching) != prepared_calls:
+							again_prepared_calls = self.getPrepared(db_caching)
+							if again_prepared_calls != prepared_calls:
+								prepared_calls = again_prepared_calls
+								id_keys = [f"transaction_{c.root_key}{composeRejsonPath(c.path)}" for c in prepared_calls]
 								raise WatchError
 							pipe.multi()
 							pipe.mset({

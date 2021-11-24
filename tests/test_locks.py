@@ -63,7 +63,7 @@ def test_add():
 		interface.set(value)
 		results['long_set'] += 1
 	
-	n = 1 * 10 ** 3
+	n = 1 * 10 ** 4
 	value = {
 		"id": "35302f1ef45e42beae445d96ab5a5fb8",
 		"name": "test_session",
