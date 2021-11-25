@@ -4,7 +4,10 @@
 		"__n__": 1,
         "__calls__": [
             "index",
-            "json"
+            "json",
+            "getPrepared",
+            "getCorrect",
+            "getAdditionalCalls"
         ],
 		"items_number": 1000
 	},
@@ -14,7 +17,10 @@
         "__calls__": [
             "index",
             "json",
-            "parent"
+            "parent",
+            "getPrepared",
+            "getCorrect",
+            "getAdditionalCalls"
         ],
 		"items_number": 1000
 	},
@@ -23,7 +29,10 @@
 		"__n__": 1,
         "__calls__": [
             "index",
-            "json"
+            "json",
+            "getPrepared",
+            "getCorrect",
+            "getAdditionalCalls"
         ],
 		"items_number": 1000
 	},
@@ -32,7 +41,10 @@
 		"__n__": 1,
         "__calls__": [
             "index",
-            "json"
+            "json",
+            "getPrepared",
+            "getCorrect",
+            "getAdditionalCalls"
         ],
 		"items_number": 1000
 	},
@@ -53,7 +65,10 @@
         "__n__": 1,
         "__calls__": [
             "index",
-            "json"
+            "json",
+            "getPrepared",
+            "getCorrect",
+            "getAdditionalCalls"
         ],
 		"items_number": 1000
     }

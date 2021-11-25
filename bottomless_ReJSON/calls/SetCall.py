@@ -33,7 +33,7 @@ class SetCall(Call):
 				
 				return SetCall((self.method_name, (self.root_key, path_, value)))
 		
-		return SetCall((self.method_name, (self.root_key, self.path, copy.deepcopy(self.value))))
+		return SetCall((self.method_name, (self.root_key, self.path, self.value)))
 	
 	def getAdditionalCalls(self, db):
 

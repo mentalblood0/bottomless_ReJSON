@@ -1,3 +1,4 @@
+import copy
 from functools import cached_property
 
 
@@ -21,7 +22,7 @@ class Call(tuple):
 		return self.args[1]
 
 	def getCorrect(self, db):
-		return self
+		return copy.deepcopy(self)
 
 	def getAdditionalCalls(self, db):
 		return []

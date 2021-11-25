@@ -1,13 +1,14 @@
 import uuid
 import json
-from loguru import logger
 from rejson import Client
 from redis import WatchError
 from flatten_dict import flatten
+from multiprocessing import cpu_count
+from multiprocessing.pool import ThreadPool
 
 from .calls import *
 from .common import *
-from . import Call, makeCaching
+from . import makeCaching
 
 
 def joinDicts(*args):
@@ -109,18 +110,18 @@ class Calls(list):
 		
 		return result
 	
-	def getPrepared(self, db):
+	def getPrepared(self, db, threads=cpu_count()//2):
 
-		result = Calls([])
+		result = []
 
 		for c in self:
 			result.append(c)
 			result.extend(c.getAdditionalCalls(db))
 		
-		for i, c in enumerate(result):
-			result[i] = c.getCorrect(db)
-
-		return result.aggregate()
+		return Calls(ThreadPool(threads).map(
+			lambda c: c.getCorrect(db),
+			result
+		)).aggregate()
 	
 	def __call__(self, db):
 
@@ -141,8 +142,6 @@ class Calls(list):
 		)
 
 		prepared_calls = None
-		id_keys = None
-		id_value = uuid.uuid4().hex
 
 		while True:
 
@@ -166,6 +165,7 @@ class Calls(list):
 					
 					pipe.multi()
 					
+					id_value = uuid.uuid4().hex
 					pipe.mset({
 						k: id_value
 						for k in id_keys
