@@ -135,38 +135,35 @@ class Calls(list):
 		while True:
 
 			try:
-				
-				transaction_id = uuid.uuid4().hex
-				db.set('transaction', transaction_id)
 
 				db_caching._cache = {}
 				prepared_calls = prepared_calls or self.getPrepared(db_caching)
 				
 				if len(prepared_calls):
 					
-					id_keys = [f"transaction_{c.root_key}{composeRejsonPath(c.path)}" for c in prepared_calls]
+					id_keys = [f"transaction_{c.root_key}{c.path}" for c in prepared_calls]
 					
 					pipe = db.pipeline()
 					pipe.watch(*id_keys)
 					
-					if pipe.get('transaction') != transaction_id:
-						db_caching._cache = {}
-						again_prepared_calls = self.getPrepared(db_caching)
-						if again_prepared_calls != prepared_calls:
-							prepared_calls = again_prepared_calls
-							raise WatchError
+					db_caching._cache = {}
+					again_prepared_calls = self.getPrepared(db_caching)
+					if again_prepared_calls != prepared_calls:
+						prepared_calls = again_prepared_calls
+						raise WatchError
 					
 					pipe.multi()
-					
+
+					transaction_id = uuid.uuid4().hex
 					pipe.mset({
 						k: transaction_id
-						for k in id_keys + ['transaction']
+						for k in id_keys
 					})
 					for c in prepared_calls:
 						c(pipe)
 					
 					pipe.execute()
-					db.delete('transaction', *id_keys)
+					db.delete(*id_keys)
 
 			except WatchError:
 				continue
