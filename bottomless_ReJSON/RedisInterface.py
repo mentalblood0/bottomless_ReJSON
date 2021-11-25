@@ -138,7 +138,7 @@ class RedisInterface:
 			return False
 		
 		index = self.parent.getIndex(field)
-		(index[value][self.path[-1]]).set(True, temp)
+		index[value][self.path[-1]].set(True, temp)
 
 		return True
 	

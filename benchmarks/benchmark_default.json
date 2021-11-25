@@ -36,6 +36,18 @@
         ],
 		"items_number": 1000
 	},
+
+    "clear::with_index": {
+		"__n__": 1,
+        "__calls__": [
+            "index",
+            "json",
+            "getPrepared",
+            "getCorrect",
+            "getAdditionalCalls"
+        ],
+		"items_number": 1000
+	},
     
     "set::without_index": {
 		"__n__": 1,

@@ -136,6 +136,9 @@ class Calls(list):
 
 			try:
 				
+				transaction_id = uuid.uuid4().hex
+				db.set('transaction', transaction_id)
+
 				db_caching._cache = {}
 				prepared_calls = prepared_calls or self.getPrepared(db_caching)
 				
@@ -146,24 +149,24 @@ class Calls(list):
 					pipe = db.pipeline()
 					pipe.watch(*id_keys)
 					
-					db_caching._cache = {}
-					again_prepared_calls = self.getPrepared(db_caching)
-					if again_prepared_calls != prepared_calls:
-						prepared_calls = again_prepared_calls
-						raise WatchError
+					if pipe.get('transaction') != transaction_id:
+						db_caching._cache = {}
+						again_prepared_calls = self.getPrepared(db_caching)
+						if again_prepared_calls != prepared_calls:
+							prepared_calls = again_prepared_calls
+							raise WatchError
 					
 					pipe.multi()
 					
-					id_value = uuid.uuid4().hex
 					pipe.mset({
-						k: id_value
-						for k in id_keys
+						k: transaction_id
+						for k in id_keys + ['transaction']
 					})
 					for c in prepared_calls:
 						c(pipe)
 					
 					pipe.execute()
-					db.delete(*id_keys)
+					db.delete('transaction', *id_keys)
 
 			except WatchError:
 				continue
