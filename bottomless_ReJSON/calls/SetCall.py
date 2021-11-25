@@ -1,3 +1,4 @@
+import copy
 from .. import Call
 from ..common import *
 from .. import RedisInterface
@@ -18,7 +19,7 @@ class SetCall(Call):
 			t = db.jsontype(self.root_key, composeRejsonPath(path_))
 			if t not in ['object', 'array']:
 				
-				value = self.value
+				value = copy.deepcopy(self.value)
 				for j in reversed(range(i, len(self.path))):
 					if type(self.path[j]) != int:
 						value = {

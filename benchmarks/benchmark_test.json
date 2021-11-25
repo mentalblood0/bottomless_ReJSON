@@ -9,7 +9,8 @@
             "getCorrect",
             "getAdditionalCalls",
             "getFromCache",
-            "addToCache"
+            "addToCache",
+            "deepcopy"
         ],
 		"items_number": 1000
 	}
