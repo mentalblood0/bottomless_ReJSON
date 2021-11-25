@@ -4,7 +4,7 @@
 		"__n__": 1,
         "__calls__": [
             "index",
-            "json",
+            "jsonget",
             "getPrepared",
             "getCorrect",
             "getAdditionalCalls",
@@ -12,9 +12,9 @@
             "addToCache",
             "deepcopy",
             "execute",
-            "joinDicts"
+            "merge"
         ],
-		"items_number": 10000
+		"items_number": 1000
 	}
 
 }

@@ -133,7 +133,6 @@ class RedisInterface:
 
 		if value == None:
 			value = self[field]()
-			print(value)
 		
 		if (value == None) or (type(value) in [dict, list]):
 			return False
@@ -149,6 +148,7 @@ class RedisInterface:
 			return
 
 		if type(payload) == dict:
+
 			for k in payload.keys():
 				self[k].addToIndexes(payload[k], temp)
 		else:
