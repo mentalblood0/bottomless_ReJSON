@@ -1,7 +1,10 @@
 import copy
+from functools import cached_property
+
 from .. import Call
 from ..common import *
 from .. import RedisInterface
+
 
 
 class SetCall(Call):
@@ -45,7 +48,8 @@ class SetCall(Call):
 		
 		return indexes_calls
 	
-	def getPreparedArgs(self):
+	@cached_property
+	def prepared_args(self):
 		return (self.root_key, composeRejsonPath(self.path), self.value)
 
 

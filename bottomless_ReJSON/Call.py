@@ -1,3 +1,7 @@
+from functools import cached_property
+
+
+
 class Call(tuple):
 
 	@property
@@ -22,11 +26,12 @@ class Call(tuple):
 	def getAdditionalCalls(self, db):
 		return []
 	
-	def getPreparedArgs(self):
+	@cached_property
+	def prepared_args(self):
 		return self.args
 	
 	def __call__(self, pipe):
-		return getattr(pipe, self.method_name)(*self.getPreparedArgs())
+		return getattr(pipe, self.method_name)(*self.prepared_args)
 
 
 
