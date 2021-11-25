@@ -133,6 +133,7 @@ class RedisInterface:
 
 		if value == None:
 			value = self[field]()
+			print(value)
 		
 		if (value == None) or (type(value) in [dict, list]):
 			return False

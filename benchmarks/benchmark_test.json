@@ -1,5 +1,5 @@
 {
-
+    
     "set::with_index": {
 		"__n__": 1,
         "__calls__": [
@@ -10,9 +10,11 @@
             "getAdditionalCalls",
             "getFromCache",
             "addToCache",
-            "deepcopy"
+            "deepcopy",
+            "execute",
+            "joinDicts"
         ],
-		"items_number": 1000
+		"items_number": 10000
 	}
 
 }

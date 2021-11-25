@@ -3,6 +3,7 @@ import json
 from rejson import Client
 from redis import WatchError
 from flatten_dict import flatten
+from deepmerge import always_merger
 from multiprocessing import cpu_count
 from multiprocessing.pool import ThreadPool
 
@@ -10,20 +11,6 @@ from .calls import *
 from .common import *
 from . import makeCaching
 
-
-def joinDicts(*args):
-
-	result = {}
-
-	for d in args:
-		
-		for key in d:
-			if key in result:
-				result[key] = joinDicts(result[key], d[key])
-			else:
-				result[key] = d[key]
-	
-	return result
 
 
 def aggregate(calls, method_name):
@@ -42,7 +29,7 @@ def aggregate(calls, method_name):
 			if not key in joined[root_key]:
 				joined[root_key][key] = value
 			else:
-				joined[root_key][key] = joinDicts(joined[root_key][key], value)
+				joined[root_key][key] = always_merger.merge(joined[root_key][key], value)
 		
 		aggregated = [
 			SetCall((method_name, (r, json.loads(k) if k else [], v)))
