@@ -77,23 +77,16 @@ class Calls(list):
 
 	def aggregate(self):
 
-		calls_by_method_name = {}
-
+		calls_by_method_name = {
+			k: []
+			for k in self.methods_order
+		}
 		for c in self:
-
-			if not c.method_name in calls_by_method_name:
-				calls_by_method_name[c.method_name] = []
 			calls_by_method_name[c.method_name].append(c)
 		
 		result = []
-
 		for name in self.methods_order:
-
-			if not name in calls_by_method_name:
-				continue
-			
-			calls = calls_by_method_name[name]
-			result.extend(aggregate(calls, name))
+			result.extend(aggregate(calls_by_method_name[name], name))
 		
 		return result
 	
