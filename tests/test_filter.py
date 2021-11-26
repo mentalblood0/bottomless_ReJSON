@@ -71,3 +71,18 @@ def test_without_index():
 	for state_value in ['new', 'processed', 'erroneous']:
 		with pytest.raises(NotImplementedError):
 			interface['sessions'].filter(state=state_value)
+
+
+def test_change_value():
+
+	interface = RedisInterface(host=config['db']['host'], port=config['db']['port'])
+	interface.db.flushdb()
+	interface['sessions'].createIndex('state')
+	interface.use_indexes_cache = False
+	interface.use_indexes_cache = True
+
+	interface['sessions'] = {
+		str(i): {'state': 'finished'}
+		for i in range(1000)
+	}
+	interface['sessions'][1000 // 2]['state'] = 'new'

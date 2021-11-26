@@ -1,6 +1,6 @@
 {
     
-    "set::with_index": {
+    "filter::one_index": {
 		"__n__": 1,
         "__calls__": [
             "index",
