@@ -209,14 +209,22 @@ class RedisInterface:
 		
 		temp(self.db)
 	
-	def filter(self, field, value):
+	def filter(self, **kwargs):
 
-		if not self.isIndexExists(field):
-			raise NotImplementedError(f"Index not exists: {self} {field}")
-
+		for field in kwargs.keys():
+			if not self.isIndexExists(field):
+				raise NotImplementedError(f"Index not exists: {self} {field}")
+		
+		keys = set()
+		for field, value in kwargs.items():
+			keys |= {
+				k
+				for k in self.getIndex(field)[value].keys()
+			}
+		
 		return [
 			self[k]
-			for k in self.getIndex(field)[value].keys()
+			for k in keys
 		]
 
 	def set(self, value, temp=None):

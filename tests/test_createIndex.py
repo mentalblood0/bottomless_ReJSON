@@ -39,16 +39,16 @@ def test_basic():
 	interface.use_indexes_cache = False
 	interface.use_indexes_cache = True
 
-	assert interface['sessions'].filter('state', 'new') == [
+	assert interface['sessions'].filter(state='new') == [
 		interface['sessions']['a'],
 		interface['sessions']['c']
 	]
 
-	assert interface['sessions'].filter('state', 'processed') == [
+	assert interface['sessions'].filter(state='processed') == [
 		interface['sessions']['b'],
 		interface['sessions']['d']
 	]
 
-	assert interface['sessions'].filter('state', 'erroneous') == [
+	assert interface['sessions'].filter(state='erroneous') == [
 		interface['sessions']['e']
 	]
