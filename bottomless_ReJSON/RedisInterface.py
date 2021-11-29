@@ -102,13 +102,13 @@ class RedisInterface:
 		t = self.type
 		
 		if t == 'object':
-			return self.db.jsonobjkeys(self.root_key, self._path)
+			return set(self.db.jsonobjkeys(self.root_key, self._path))
 		
 		elif t == 'array':
-			return [i for i in range(self.db.jsonarrlen(self.root_key, self._path))]
+			return {i for i in range(self.db.jsonarrlen(self.root_key, self._path))}
 		
 		else:
-			return []
+			return set()
 	
 	@property
 	def type(self):
@@ -218,10 +218,7 @@ class RedisInterface:
 		keys = set()
 		for field, value in kwargs.items():
 			if not keys:
-				keys = {
-					k
-					for k in self.getIndex(field)[value].keys()
-				}
+				keys = self.getIndex(field)[value].keys()
 				if not keys:
 					return []
 			else:
@@ -232,10 +229,7 @@ class RedisInterface:
 						if self.getIndex(field)[value][k].type != None
 					}
 				else:
-					keys &= {
-						k
-						for k in self.getIndex(field)[value].keys()
-					}
+					keys &= self.getIndex(field)[value].keys()
 		
 		return [
 			self[k]

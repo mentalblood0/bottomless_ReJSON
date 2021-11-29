@@ -12,7 +12,7 @@ def test_no_keys():
 	interface = RedisInterface(host=config['db']['host'], port=config['db']['port'])
 	interface.db.flushdb()
 
-	assert interface['sessions'].keys() == []
+	assert interface['sessions'].keys() == set()
 
 
 def test_many_complex():
