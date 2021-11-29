@@ -22,7 +22,7 @@ class SetCall(Call):
 			t = db.jsontype(self.root_key, composeRejsonPath(path_))
 			if t not in ['object', 'array']:
 				
-				value = copy.deepcopy(self.value)
+				value = self.value
 				for j in reversed(range(i, len(self.path))):
 					if type(self.path[j]) != int:
 						value = {
@@ -33,7 +33,7 @@ class SetCall(Call):
 				
 				return SetCall((self.method_name, (self.root_key, path_, value)))
 		
-		return SetCall((self.method_name, (self.root_key, self.path, self.value)))
+		return self
 	
 	def getAdditionalCalls(self, db):
 

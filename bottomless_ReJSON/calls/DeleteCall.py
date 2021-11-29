@@ -17,7 +17,7 @@ class DeleteCall(Call):
 		return self.args[1]
 
 	def getCorrect(self, *args, **kwargs):
-		return DeleteCall((self.method_name, (self.root_key, self.path)))
+		return self
 	
 	def getAdditionalCalls(self, db):
 
