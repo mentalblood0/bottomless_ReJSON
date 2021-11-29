@@ -223,6 +223,7 @@ class RedisInterface:
 		if not field_with_min_elements:
 			return set()
 		keys = self.getIndex(field_with_min_elements)[value_with_min_elements].keys()
+		del kwargs[field_with_min_elements]
 		
 		for field, value in kwargs.items():
 			if len(keys) < len(self.getIndex(field)[value]):
