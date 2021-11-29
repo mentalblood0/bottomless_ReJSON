@@ -34,19 +34,19 @@ def test_with_index():
 	interface.use_indexes_cache = False
 	interface.use_indexes_cache = True
 
-	assert interface['sessions'].filter(state='new') == [
+	assert interface['sessions'].filter(state='new') == {
 		interface['sessions']['a'],
 		interface['sessions']['c']
-	]
+	}
 
-	assert interface['sessions'].filter(state='processed') == [
+	assert interface['sessions'].filter(state='processed') == {
 		interface['sessions']['b'],
 		interface['sessions']['d']
-	]
+	}
 
-	assert interface['sessions'].filter(state='erroneous') == [
+	assert interface['sessions'].filter(state='erroneous') == {
 		interface['sessions']['e']
-	]
+	}
 
 
 def test_without_index():
@@ -117,4 +117,4 @@ def test_n_index():
 		for i in range(index_number)
 	})
 
-	assert result == [interface['sessions']['0']]
+	assert result == {interface['sessions']['0']}

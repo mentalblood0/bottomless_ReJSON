@@ -77,6 +77,10 @@ class RedisInterface:
 		return self.db.connection_pool.connection_kwargs['port']
 	
 	@property
+	def db_id(self):
+		return self.db.connection_pool.connection_kwargs['db']
+	
+	@property
 	def use_indexes_cache(self):
 		return getAllIndexes__use_cache
 	
@@ -220,7 +224,7 @@ class RedisInterface:
 			if not keys:
 				keys = self.getIndex(field)[value].keys()
 				if not keys:
-					return []
+					return set()
 			else:
 				if len(keys) < len(self.getIndex(field)[value]):
 					keys = {
@@ -231,10 +235,10 @@ class RedisInterface:
 				else:
 					keys &= self.getIndex(field)[value].keys()
 		
-		return [
+		return {
 			self[k]
 			for k in keys
-		]
+		}
 
 	def set(self, value, temp=None):
 
@@ -338,3 +342,15 @@ class RedisInterface:
 	
 	def __bool__(self):
 		return True
+	
+	def __hash__(self):
+		return hash((
+			str(e)
+			for e in [
+				self.host,
+				self.port,
+				self.db_id,
+				self.root_key,
+				self.path
+			]
+		))
