@@ -222,6 +222,8 @@ class RedisInterface:
 					k
 					for k in self.getIndex(field)[value].keys()
 				}
+				if not keys:
+					return []
 			else:
 				keys = {
 					k

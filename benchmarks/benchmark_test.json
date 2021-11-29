@@ -15,8 +15,8 @@
 			"merge",
 			"aggregate"
 		],
-		"items_number": 10,
-		"index_number": 1000
+		"items_number": 1000,
+		"index_number": 10
 	}
 
 }
