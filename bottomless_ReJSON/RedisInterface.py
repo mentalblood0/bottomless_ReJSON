@@ -215,21 +215,24 @@ class RedisInterface:
 			if not self.isIndexExists(field):
 				raise NotImplementedError(f"Index not exists: {self} {field}")
 		
-		keys = set()
+		field_with_min_elements, value_with_min_elements = min(
+			kwargs.items(),
+			key=lambda item: (lambda field, value: len(self.getIndex(field)[value]))(*item),
+			default=(None, None)
+		)
+		if not field_with_min_elements:
+			return set()
+		keys = self.getIndex(field_with_min_elements)[value_with_min_elements].keys()
+		
 		for field, value in kwargs.items():
-			if not keys:
-				keys = self.getIndex(field)[value].keys()
-				if not keys:
-					return set()
+			if len(keys) < len(self.getIndex(field)[value]):
+				keys = {
+					k
+					for k in keys
+					if self.getIndex(field)[value][k].type != None
+				}
 			else:
-				if len(keys) < len(self.getIndex(field)[value]):
-					keys = {
-						k
-						for k in keys
-						if self.getIndex(field)[value][k].type != None
-					}
-				else:
-					keys &= self.getIndex(field)[value].keys()
+				keys &= self.getIndex(field)[value].keys()
 		
 		return {
 			self[k]
