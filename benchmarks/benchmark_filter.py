@@ -51,7 +51,7 @@ class n_index(Benchmark):
 
 	def run(self, index_number, **kwargs):
 		self.interface['sessions'].filter(**{
-			f"property_{i}": False
+			f"property_{i}": True
 			for i in range(index_number)
 		})
 	

@@ -225,11 +225,17 @@ class RedisInterface:
 				if not keys:
 					return []
 			else:
-				keys = {
-					k
-					for k in keys
-					if self.getIndex(field)[value][k].type != None
-				}
+				if len(keys) < len(self.getIndex(field)[value]):
+					keys = {
+						k
+						for k in keys
+						if self.getIndex(field)[value][k].type != None
+					}
+				else:
+					keys &= {
+						k
+						for k in self.getIndex(field)[value].keys()
+					}
 		
 		return [
 			self[k]
