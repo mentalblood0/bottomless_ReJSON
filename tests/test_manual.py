@@ -1,4 +1,3 @@
-import pytest
 from redis import Redis
 
 from tests import config

@@ -1,5 +1,4 @@
 import uuid
-import pytest
 from time import sleep
 from threading import Thread
 

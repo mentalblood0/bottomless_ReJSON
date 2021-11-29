@@ -1,7 +1,3 @@
-import pytest
-from time import sleep
-from rejson import Client, Path
-
 from tests import config
 import bottomless_ReJSON.RedisInterface as RedisInterface
 

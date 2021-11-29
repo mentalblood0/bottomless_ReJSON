@@ -1,6 +1,3 @@
-import pytest
-
-from tests import config
 from bottomless_ReJSON import makeCaching
 
 

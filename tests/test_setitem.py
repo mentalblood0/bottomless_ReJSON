@@ -1,6 +1,5 @@
 import uuid
 import time
-import pytest
 from datetime import datetime
 from threading import Thread
 

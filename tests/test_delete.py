@@ -1,5 +1,4 @@
 import json
-import pytest
 
 from tests import config
 import bottomless_ReJSON.RedisInterface as RedisInterface
