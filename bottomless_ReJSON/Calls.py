@@ -98,7 +98,7 @@ class Calls(list):
 			result.append(c)
 			result.extend(c.getAdditionalCalls(db))
 		
-		mapper = ThreadPool(threads).map if len(result) >= threads else map
+		mapper = map
 
 		return Calls(mapper(
 			lambda c: c.getCorrect(db),

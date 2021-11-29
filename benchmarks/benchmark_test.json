@@ -1,6 +1,6 @@
 {
 	
-	"filter::n_index": {
+	"set::with_index": {
 		"__n__": 1,
 		"__calls__": [
 			"index",
@@ -15,8 +15,7 @@
 			"merge",
 			"aggregate"
 		],
-		"items_number": 1000,
-		"index_number": 100
+		"items_number": 1000
 	}
 
 }
