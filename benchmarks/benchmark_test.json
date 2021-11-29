@@ -1,21 +1,22 @@
 {
-    
-    "filter::one_index": {
+	
+	"filter::n_index": {
 		"__n__": 1,
-        "__calls__": [
-            "index",
-            "json",
-            "getPrepared",
-            "getCorrect",
-            "getAdditionalCalls",
-            "getFromCache",
-            "addToCache",
-            "deepcopy",
-            "execute",
-            "merge",
-            "aggregate"
-        ],
-		"items_number": 1000
+		"__calls__": [
+			"index",
+			"json",
+			"getPrepared",
+			"getCorrect",
+			"getAdditionalCalls",
+			"getFromCache",
+			"addToCache",
+			"deepcopy",
+			"execute",
+			"merge",
+			"aggregate"
+		],
+		"items_number": 10,
+		"index_number": 100
 	}
 
 }

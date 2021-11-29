@@ -75,6 +75,8 @@ def test_without_index():
 
 def test_change_value():
 
+	items_number = 10
+
 	interface = RedisInterface(host=config['db']['host'], port=config['db']['port'])
 	interface.db.flushdb()
 	interface['sessions'].createIndex('state')
@@ -83,6 +85,36 @@ def test_change_value():
 
 	interface['sessions'] = {
 		str(i): {'state': 'finished'}
-		for i in range(1000)
+		for i in range(items_number)
 	}
-	interface['sessions'][1000 // 2]['state'] = 'new'
+	interface['sessions'][str(items_number // 2)]['state'] = 'new'
+
+
+def test_n_index():
+
+	items_number = 10
+	index_number = 10
+
+	interface = RedisInterface(host=config['db']['host'], port=config['db']['port'])
+	interface.db.flushdb()
+
+	for i in range(index_number):
+		interface['sessions'].createIndex(f"property_{i}")
+	interface.use_indexes_cache = False
+	interface.use_indexes_cache = True
+
+	interface['sessions'] = {
+		str(j): {
+			f"property_{i}": bool(j)
+			for i in range(index_number)
+		}
+		for j in range(items_number)
+	}
+	interface['sessions'][str(items_number // 2)]['state'] = 'new'
+
+	result = interface['sessions'].filter(**{
+		f"property_{i}": False
+		for i in range(index_number)
+	})
+
+	assert result == [interface['sessions']['0']]
