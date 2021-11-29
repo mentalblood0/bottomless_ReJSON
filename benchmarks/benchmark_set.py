@@ -12,7 +12,7 @@ class without_index(Benchmark):
 	def prepare(self, **kwargs):
 
 		self.interface = RedisInterface(host=config['db']['host'], port=config['db']['port'])
-		self.interface.db.flushdb()
+		self.interface.clear()
 		self.interface.updateIndexesList()
 
 	def run(self, items_number):
@@ -22,15 +22,14 @@ class without_index(Benchmark):
 		}
 	
 	def clean(self, **kwargs):
-		self.interface.db.flushdb()
-
+		self.interface.clear()
 
 class without_index_descrete(Benchmark):
 
 	def prepare(self, **kwargs):
 
 		self.interface = RedisInterface(host=config['db']['host'], port=config['db']['port'])
-		self.interface.db.flushdb()
+		self.interface.clear()
 		self.interface.updateIndexesList()
 
 	def run(self, items_number):
@@ -38,15 +37,14 @@ class without_index_descrete(Benchmark):
 			self.interface['sessions'][str(i)] = {'state': 'new'}
 	
 	def clean(self, **kwargs):
-		self.interface.db.flushdb()
-
+		self.interface.clear()
 
 class with_index(Benchmark):
 
 	def prepare(self, **kwargs):
 
 		self.interface = RedisInterface(host=config['db']['host'], port=config['db']['port'])
-		self.interface.db.flushdb()
+		self.interface.clear()
 		self.interface.updateIndexesList()
 		
 		self.interface['sessions'].createIndex('state')
@@ -60,15 +58,14 @@ class with_index(Benchmark):
 		}
 	
 	def clean(self, **kwargs):
-		self.interface.db.flushdb()
-
+		self.interface.clear()
 
 class with_index_descrete(Benchmark):
 
 	def prepare(self, **kwargs):
 
 		self.interface = RedisInterface(host=config['db']['host'], port=config['db']['port'])
-		self.interface.db.flushdb()
+		self.interface.clear()
 		self.interface.updateIndexesList()
 		
 		self.interface['sessions'].createIndex('state')
@@ -80,4 +77,4 @@ class with_index_descrete(Benchmark):
 			self.interface['sessions'][str(i)] = {'state': 'new'}
 	
 	def clean(self, **kwargs):
-		self.interface.db.flushdb()
+		self.interface.clear()

@@ -10,18 +10,14 @@ import bottomless_ReJSON.RedisInterface as RedisInterface
 def test_no_keys():
 
 	interface = RedisInterface(host=config['db']['host'], port=config['db']['port'])
-	interface.db.flushdb()
-	interface.updateIndexesList()
-
+	interface.clear()
 	assert interface['sessions'].keys() == set()
 
 
 def test_many_complex():
 
 	interface = RedisInterface(host=config['db']['host'], port=config['db']['port'])
-	interface.db.flushdb()
-	interface.updateIndexesList()
-
+	interface.clear()
 	sessions = {}
 
 	for i in range(2):

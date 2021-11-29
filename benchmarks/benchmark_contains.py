@@ -10,9 +10,7 @@ class in_object(Benchmark):
 	def prepare(self, items_number):
 
 		self.interface = RedisInterface(host=config['db']['host'], port=config['db']['port'])
-		self.interface.db.flushdb()
-	interface.updateIndexesList()
-
+		self.interface.clear()
 		self.interface['sessions'] = {
 			str(i): {}
 			for i in range(items_number)
@@ -22,4 +20,4 @@ class in_object(Benchmark):
 		str(items_number // 2) in self.interface
 	
 	def clean(self, **kwargs):
-		self.interface.db.flushdb()
+		self.interface.clear()

@@ -8,9 +8,7 @@ import bottomless_ReJSON.RedisInterface as RedisInterface
 def test_object():
 
 	interface = RedisInterface(host=config['db']['host'], port=config['db']['port'])
-	interface.db.flushdb()
-	interface.updateIndexesList()
-
+	interface.clear()
 	interface |= {
 		'sessions': {
 			1: {
@@ -34,9 +32,7 @@ def test_object():
 def test_array():
 
 	interface = RedisInterface(host=config['db']['host'], port=config['db']['port'])
-	interface.db.flushdb()
-	interface.updateIndexesList()
-
+	interface.clear()
 	interface.set([
 		[
 			[

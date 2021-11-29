@@ -9,8 +9,7 @@ import bottomless_ReJSON.RedisInterface as RedisInterface
 def test_valid_key():
 
 	interface = RedisInterface(host=config['db']['host'], port=config['db']['port'])
-	interface.db.flushdb()
-	interface.updateIndexesList()
+	interface.clear()
 	interface['key'] = 'value'
 
 	del interface['key']
@@ -19,8 +18,7 @@ def test_valid_key():
 def test_cascade():
 
 	interface = RedisInterface(host=config['db']['host'], port=config['db']['port'])
-	interface.db.flushdb()
-	interface.updateIndexesList()
+	interface.clear()
 
 	interface['1'] = 'one'
 	interface['2'] = 'two'
@@ -44,9 +42,7 @@ def test_cascade():
 def test_with_indexes():
 
 	interface = RedisInterface(host=config['db']['host'], port=config['db']['port'])
-	interface.db.flushdb()
-	interface.updateIndexesList()
-	interface.updateIndexesList()
+	interface.clear()
 
 	with open('tests/test_delete_db.json') as f:
 		db = json.load(f)
@@ -55,7 +51,6 @@ def test_with_indexes():
 	with open('tests/test_delete_db_indexes.json') as f:
 		indexes = json.load(f)
 	interface.indexes.set(indexes)
-	
 	interface.updateIndexesList()
 
 	assert interface == db
@@ -67,5 +62,4 @@ def test_with_indexes():
 	interface.clear()
 
 	assert interface == None
-	print(interface.indexes())
-	assert interface.indexes == {'sessions': {'__index__': {'state': {'new': {}, 'selected': {}, 'finished': {}}}}}
+	assert interface.indexes == None

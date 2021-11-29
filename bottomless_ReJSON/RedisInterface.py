@@ -109,6 +109,10 @@ class RedisInterface:
 	
 	@property
 	def indexes_list(self):
+		
+		if not self._indexes_list_key in self.__class__.indexes:
+			self.__class__.indexes[self._indexes_list_key] = []
+		
 		return self.__class__.indexes[self._indexes_list_key]
 	
 	@indexes_list.setter
@@ -246,6 +250,11 @@ class RedisInterface:
 			self[key].set(value)
 	
 	def clear(self, temp=None):
+
+		if not self.path:
+			self.db.flushdb()
+			self.indexes_list = []
+			return
 
 		new_call = DeleteCall(('jsondel', (self.root_key, self.path)))
 		

@@ -11,9 +11,7 @@ import bottomless_ReJSON.RedisInterface as RedisInterface
 def test_interrupt():
 
 	interface = RedisInterface(host=config['db']['host'], port=config['db']['port'])
-	interface.db.flushdb()
-	interface.updateIndexesList()
-
+	interface.clear()
 	db = interface.db
 
 	key = 'default'
@@ -34,9 +32,7 @@ def test_interrupt():
 def test_delete_after_multi():
 
 	interface = RedisInterface(host=config['db']['host'], port=config['db']['port'])
-	interface.db.flushdb()
-	interface.updateIndexesList()
-
+	interface.clear()
 	db = interface.db
 
 	key = 'default'
@@ -54,9 +50,7 @@ def test_delete_after_multi():
 def test_update():
 
 	interface = RedisInterface(host=config['db']['host'], port=config['db']['port'])
-	interface.db.flushdb()
-	interface.updateIndexesList()
-
+	interface.clear()
 	results = {'long_set': False, 'long_get': None}
 
 	def long_set(interface, key, value):
@@ -66,7 +60,6 @@ def test_update():
 	def long_get(interface, key, valid_key, results):
 		while not results['long_set']:
 			sleep(0.1)
-		print(interface(), interface[key](), valid_key)
 		results['long_get'] = (interface[key]() == valid_key)
 	
 	n = 1 * 10 ** 2
@@ -98,9 +91,7 @@ def test_update():
 def test_add():
 
 	interface = RedisInterface(host=config['db']['host'], port=config['db']['port'])
-	interface.db.flushdb()
-	interface.updateIndexesList()
-
+	interface.clear()
 	results = {'long_set': 0}
 
 	def long_set(interface, value):
@@ -133,5 +124,4 @@ def test_add():
 	while not (results['long_set'] == n):
 		sleep(0.1)
 	
-	# print(interface['sessions']())
 	assert len(interface['sessions']) == n

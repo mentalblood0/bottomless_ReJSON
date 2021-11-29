@@ -8,15 +8,10 @@ import bottomless_ReJSON.RedisInterface as RedisInterface
 def test_add_simple():
 
 	interface = RedisInterface(host=config['db']['host'], port=config['db']['port'])
-	interface.db.flushdb()
-	interface.updateIndexesList()
-	
+	interface.clear()	
 	interface['sessions'].createIndex('state')
-	interface.updateIndexesList()
 	
 	interface['sessions']['f'] = {'state': 'new'}
-
-	print(interface.indexes())
 
 	assert interface.indexes['sessions']['__index__']['state']['new']['f']() == True
 	assert interface['sessions'].filter(state='new') == {
@@ -27,12 +22,8 @@ def test_add_simple():
 def test_add_complex():
 
 	interface = RedisInterface(host=config['db']['host'], port=config['db']['port'])
-	interface.db.flushdb()
-	interface.updateIndexesList()
-	interface.updateIndexesList()
-
+	interface.clear()
 	interface['sessions'].createIndex('state')
-	interface.updateIndexesList()
 
 	interface['sessions'] = {
 		'a': {'state': 'new'},
@@ -51,12 +42,9 @@ def test_add_complex():
 def test_add_simple_after_complex():
 
 	interface = RedisInterface(host=config['db']['host'], port=config['db']['port'])
-	interface.db.flushdb()
-	interface.updateIndexesList()
-	interface.updateIndexesList()
+	interface.clear()
 
 	interface['sessions'].createIndex('state')
-	interface.updateIndexesList()
 
 	interface['sessions'] = {
 		'a': {'state': 'new'},
@@ -79,12 +67,8 @@ def test_add_simple_after_complex():
 def test_remove_simple():
 
 	interface = RedisInterface(host=config['db']['host'], port=config['db']['port'])
-	interface.db.flushdb()
-	interface.updateIndexesList()
-	interface.updateIndexesList()
-
+	interface.clear()
 	interface['sessions'].createIndex('state')
-	interface.updateIndexesList()
 
 	interface['sessions'] = {
 		'a': {'state': 'new'},
@@ -94,9 +78,6 @@ def test_remove_simple():
 		'e': {'state': 'erroneous'}
 	}
 
-	print(interface.indexes())
-	print(interface.indexes_list)
-	print('del')
 	del interface['sessions']['a']
 
 	assert interface.indexes['sessions']['__index__']['state']['new']['a']() == None
@@ -110,12 +91,8 @@ def test_remove_simple():
 def test_remove_complex():
 
 	interface = RedisInterface(host=config['db']['host'], port=config['db']['port'])
-	interface.db.flushdb()
-	interface.updateIndexesList()
-	interface.updateIndexesList()
-
+	interface.clear()
 	interface['sessions'].createIndex('state')
-	interface.updateIndexesList()
 
 	interface['sessions'] = {
 		'a': {'state': 'new'},
@@ -126,8 +103,6 @@ def test_remove_complex():
 	}
 
 	del interface['sessions']
-
-	print('indexes', interface.indexes())
 
 	assert interface.indexes['sessions']['__index__']['state']() == {
 		state: {}
@@ -141,18 +116,13 @@ def test_remove_complex():
 def test_update_value():
 
 	interface = RedisInterface(host=config['db']['host'], port=config['db']['port'])
-	interface.db.flushdb()
-	interface.updateIndexesList()
-	interface.updateIndexesList()
-
+	interface.clear()
 	interface['sessions'].createIndex('state')
-	interface.updateIndexesList()
 
 	interface['sessions'] = {
 		'a': {'state': 'new'}
 	}
 
-	print('update')
 	interface['sessions']['a']['state'] = 'processed'
 	assert interface['sessions'].filter(state='new') == set()
 	assert interface['sessions'].filter(state='processed') == {
@@ -170,12 +140,8 @@ def test_update_value():
 def test_update():
 
 	interface = RedisInterface(host=config['db']['host'], port=config['db']['port'])
-	interface.db.flushdb()
-	interface.updateIndexesList()
-	interface.updateIndexesList()
-
+	interface.clear()
 	interface['sessions'].createIndex('state')
-	interface.updateIndexesList()
 
 	interface['sessions'] = {
 		'a': {'state': 'new'},
@@ -195,7 +161,7 @@ def test_update():
 	assert interface.indexes['sessions']['__index__']['state']['new']['a']() == None
 	assert interface.indexes['sessions']['__index__']['state']['processed']['d']() == None
 	assert interface.indexes['sessions']['__index__']['state']['new']['f']() == True
-	print("interface['sessions'].filter(state='new')", interface['sessions'].filter(state='new'))
+	
 	assert interface['sessions'].filter(state='new') == {
 		interface['sessions']['c'],
 		interface['sessions']['f']
@@ -211,11 +177,8 @@ def test_update():
 def test_update_complex():
 
 	interface = RedisInterface(host=config['db']['host'], port=config['db']['port'])
-	interface.db.flushdb()
-	interface.updateIndexesList()
-
+	interface.clear()
 	interface['key']['sessions'].createIndex('state')
-	interface.updateIndexesList()
 
 	interface['key']['sessions'] = {
 		'a': {'state': 'new'},
@@ -233,8 +196,6 @@ def test_update_complex():
 			'f': {'state': 'new'}
 		}
 	}
-
-	print(f"indexes: {interface.indexes()}")
 
 	assert interface.indexes['key']['sessions']['__index__']['state']['new']['a']() == None
 	assert interface.indexes['key']['sessions']['__index__']['state']['processed']['d']() == None
@@ -254,13 +215,10 @@ def test_update_complex():
 def test_clear():
 
 	interface = RedisInterface(host=config['db']['host'], port=config['db']['port'])
-	interface.db.flushdb()
-	interface.updateIndexesList()
-
+	interface.clear()
 	assert interface() == None
 
 	interface['sessions'].createIndex('state')
-	interface.updateIndexesList()
 
 	interface['sessions'] = {
 		'a': {'state': 'new'},
@@ -270,18 +228,13 @@ def test_clear():
 		'e': {'state': 'erroneous'}
 	}
 
-	print('clear')
 	interface.clear()
 
-	print('interface', interface())
 	assert interface() == None
 
-	assert interface.indexes['sessions']['__index__']['state']() == {
-		state: {}
-		for state in ['new', 'processed', 'erroneous']
-	}
-	assert interface['sessions'].filter(state='new') == set()
-	assert interface['sessions'].filter(state='processed') == set()
-	assert interface['sessions'].filter(state='erroneous') == set()
+	assert interface.indexes['sessions']['__index__']['state']() == None
+	for state_value in ['new', 'processed', 'erroneous']:
+		with pytest.raises(NotImplementedError):
+			interface['sessions'].filter(state=state_value)
 
 	# assert False

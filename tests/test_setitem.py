@@ -12,9 +12,7 @@ import bottomless_ReJSON.RedisInterface as RedisInterface
 def test_basic():
 
 	interface = RedisInterface(host=config['db']['host'], port=config['db']['port'])
-	interface.db.flushdb()
-	interface.updateIndexesList()
-
+	interface.clear()
 	interface['1'] = 'one'
 	assert interface['1'] == 'one'
 
@@ -31,9 +29,7 @@ def test_basic():
 def test_types():
 
 	interface = RedisInterface(host=config['db']['host'], port=config['db']['port'])
-	interface.db.flushdb()
-	interface.updateIndexesList()
-
+	interface.clear()
 	objects = [
 		[],
 		1,
@@ -50,9 +46,7 @@ def test_types():
 def test_complex():
 
 	interface = RedisInterface(host=config['db']['host'], port=config['db']['port'])
-	interface.db.flushdb()
-	interface.updateIndexesList()
-
+	interface.clear()
 	interface['1'] = {
 		'1': 'one.one',
 		'2': 'one.two'
@@ -65,9 +59,7 @@ def test_complex():
 def test_complex_arrays():
 
 	interface = RedisInterface(host=config['db']['host'], port=config['db']['port'])
-	interface.db.flushdb()
-	interface.updateIndexesList()
-
+	interface.clear()
 	interface['sessions']['__index__']['state']['new'] = [
 		['sessions', 'a'],
 		['sessions', 'c']
@@ -77,9 +69,7 @@ def test_complex_arrays():
 def test_complex_indexes_arrays():
 
 	interface = RedisInterface(host=config['db']['host'], port=config['db']['port'])
-	interface.db.flushdb()
-	interface.updateIndexesList()
-
+	interface.clear()
 	interface['sessions'] = {
 		'a': {
 			'state': 'new'
@@ -107,9 +97,7 @@ def test_complex_indexes_arrays():
 def test_many_complex():
 
 	interface = RedisInterface(host=config['db']['host'], port=config['db']['port'])
-	interface.db.flushdb()
-	interface.updateIndexesList()
-
+	interface.clear()
 	sessions = {}
 
 	for i in range(2):
@@ -138,9 +126,7 @@ def test_many_complex():
 def test_async():
 
 	interface = RedisInterface(host=config['db']['host'], port=config['db']['port'])
-	interface.db.flushdb()
-	interface.updateIndexesList()
-
+	interface.clear()
 	types = {
 		bool: False,
 		dict: {
@@ -182,7 +168,6 @@ def test_async():
 		for key in setters:
 			if key in report:
 				result = interface[key]()
-				print(key, result)
 				if not any([result == value for value in types.values()]):
 					for key in setters:
 						for t in setters[key]:

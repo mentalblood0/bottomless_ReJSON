@@ -10,7 +10,7 @@ class one_index(Benchmark):
 	def prepare(self, items_number):
 
 		self.interface = RedisInterface(host=config['db']['host'], port=config['db']['port'])
-		self.interface.db.flushdb()
+		self.interface.clear()
 		self.interface.updateIndexesList()
 		
 		self.interface['sessions'].createIndex('state')
@@ -27,15 +27,14 @@ class one_index(Benchmark):
 		self.interface['sessions'].filter(state='new')
 	
 	def clean(self, **kwargs):
-		self.interface.db.flushdb()
-
+		self.interface.clear()
 
 class n_index(Benchmark):
 
 	def prepare(self, items_number, index_number):
 
 		self.interface = RedisInterface(host=config['db']['host'], port=config['db']['port'])
-		self.interface.db.flushdb()
+		self.interface.clear()
 		self.interface.updateIndexesList()
 
 		for i in range(index_number):
@@ -59,4 +58,4 @@ class n_index(Benchmark):
 		})
 	
 	def clean(self, **kwargs):
-		self.interface.db.flushdb()
+		self.interface.clear()

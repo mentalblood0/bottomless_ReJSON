@@ -8,9 +8,7 @@ import bottomless_ReJSON.RedisInterface as RedisInterface
 def test_basic():
 
 	interface = RedisInterface(host=config['db']['host'], port=config['db']['port'])
-	interface.db.flushdb()
-	interface.updateIndexesList()
-
+	interface.clear()
 	interface |= {
 		'1': {
 			'1': {
@@ -35,9 +33,7 @@ def test_basic():
 def test_not_empty():
 
 	interface = RedisInterface(host=config['db']['host'], port=config['db']['port'])
-	interface.db.flushdb()
-	interface.updateIndexesList()
-
+	interface.clear()
 	interface['key'] = {
 		'a': 1
 	}
@@ -61,20 +57,16 @@ def test_not_empty():
 def test_not_dict():
 
 	interface = RedisInterface(host=config['db']['host'], port=config['db']['port'])
-	interface.db.flushdb()
-	interface.updateIndexesList()
-
+	interface.clear()
 	key = '1'
 
 	interface[key] = False
-	print(interface())
 	assert interface[key]() == False
 
 	interface[key] = {
 		'a': 1,
 		'b': 2
 	}
-	print(interface())
 	assert interface[key]() == {
 		'a': 1,
 		'b': 2
@@ -87,9 +79,7 @@ def test_not_dict():
 def test_deep_dict_shallow_update():
 
 	interface = RedisInterface(host=config['db']['host'], port=config['db']['port'])
-	interface.db.flushdb()
-	interface.updateIndexesList()
-
+	interface.clear()
 	key = 'key'
 	deep = {
 		'a': {
@@ -113,5 +103,4 @@ def test_deep_dict_shallow_update():
 	assert interface[key]() == deep
 
 	interface[key] |= shallow
-	print(interface[key](), '==', deep | shallow)
 	assert interface[key]() == deep | shallow
