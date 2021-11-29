@@ -11,6 +11,7 @@ class without_index(Benchmark):
 
 		self.interface = RedisInterface(host=config['db']['host'], port=config['db']['port'])
 		self.interface.db.flushdb()
+	interface.updateIndexesList()
 
 		self.interface['sessions'] = {
 			str(i): {'state': 'new'}

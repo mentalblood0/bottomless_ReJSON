@@ -11,6 +11,7 @@ class same(Benchmark):
 
 		self.interface = RedisInterface(host=config['db']['host'], port=config['db']['port'])
 		self.interface.db.flushdb()
+	interface.updateIndexesList()
 
 		self.interface['sessions'] = {
 			str(i): {'state': 'new'}
@@ -22,6 +23,7 @@ class same(Benchmark):
 	
 	def clean(self, **kwargs):
 		self.interface.db.flushdb()
+	interface.updateIndexesList()
 
 
 class different(Benchmark):
@@ -30,6 +32,7 @@ class different(Benchmark):
 
 		self.interface = RedisInterface(host=config['db']['host'], port=config['db']['port'])
 		self.interface.db.flushdb()
+	interface.updateIndexesList()
 
 		self.interface['sessions'] = {
 			str(i): {'state': str(i)}

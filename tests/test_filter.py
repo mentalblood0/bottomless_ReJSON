@@ -9,6 +9,7 @@ def test_with_index():
 
 	interface = RedisInterface(host=config['db']['host'], port=config['db']['port'])
 	interface.db.flushdb()
+	interface.updateIndexesList()
 
 	interface['sessions'] = {
 		'a': {'state': 'new'},
@@ -31,8 +32,7 @@ def test_with_index():
 			'e': True
 		}
 	}
-	interface.use_indexes_cache = False
-	interface.use_indexes_cache = True
+	interface.updateIndexesList()
 
 	assert interface['sessions'].filter(state='new') == {
 		interface['sessions']['a'],
@@ -53,8 +53,8 @@ def test_without_index():
 
 	interface = RedisInterface(host=config['db']['host'], port=config['db']['port'])
 	interface.db.flushdb()
-	interface.use_indexes_cache = False
-	interface.use_indexes_cache = True
+	interface.updateIndexesList()
+	interface.updateIndexesList()
 
 	interface['sessions'] = {
 		'a': {'state': 'new'},
@@ -66,8 +66,7 @@ def test_without_index():
 
 	assert interface.indexes == None
 
-	interface.use_indexes_cache = False
-	interface.use_indexes_cache = True
+	interface.updateIndexesList()
 	for state_value in ['new', 'processed', 'erroneous']:
 		with pytest.raises(NotImplementedError):
 			interface['sessions'].filter(state=state_value)
@@ -79,9 +78,9 @@ def test_change_value():
 
 	interface = RedisInterface(host=config['db']['host'], port=config['db']['port'])
 	interface.db.flushdb()
+	interface.updateIndexesList()
 	interface['sessions'].createIndex('state')
-	interface.use_indexes_cache = False
-	interface.use_indexes_cache = True
+	interface.updateIndexesList()
 
 	interface['sessions'] = {
 		str(i): {'state': 'finished'}
@@ -97,11 +96,11 @@ def test_n_index():
 
 	interface = RedisInterface(host=config['db']['host'], port=config['db']['port'])
 	interface.db.flushdb()
+	interface.updateIndexesList()
 
 	for i in range(index_number):
 		interface['sessions'].createIndex(f"property_{i}")
-	interface.use_indexes_cache = False
-	interface.use_indexes_cache = True
+	interface.updateIndexesList()
 
 	interface['sessions'] = {
 		str(j): {

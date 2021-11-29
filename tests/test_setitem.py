@@ -13,6 +13,7 @@ def test_basic():
 
 	interface = RedisInterface(host=config['db']['host'], port=config['db']['port'])
 	interface.db.flushdb()
+	interface.updateIndexesList()
 
 	interface['1'] = 'one'
 	assert interface['1'] == 'one'
@@ -31,6 +32,7 @@ def test_types():
 
 	interface = RedisInterface(host=config['db']['host'], port=config['db']['port'])
 	interface.db.flushdb()
+	interface.updateIndexesList()
 
 	objects = [
 		[],
@@ -49,6 +51,7 @@ def test_complex():
 
 	interface = RedisInterface(host=config['db']['host'], port=config['db']['port'])
 	interface.db.flushdb()
+	interface.updateIndexesList()
 
 	interface['1'] = {
 		'1': 'one.one',
@@ -63,6 +66,7 @@ def test_complex_arrays():
 
 	interface = RedisInterface(host=config['db']['host'], port=config['db']['port'])
 	interface.db.flushdb()
+	interface.updateIndexesList()
 
 	interface['sessions']['__index__']['state']['new'] = [
 		['sessions', 'a'],
@@ -74,6 +78,7 @@ def test_complex_indexes_arrays():
 
 	interface = RedisInterface(host=config['db']['host'], port=config['db']['port'])
 	interface.db.flushdb()
+	interface.updateIndexesList()
 
 	interface['sessions'] = {
 		'a': {
@@ -103,6 +108,7 @@ def test_many_complex():
 
 	interface = RedisInterface(host=config['db']['host'], port=config['db']['port'])
 	interface.db.flushdb()
+	interface.updateIndexesList()
 
 	sessions = {}
 
@@ -133,6 +139,7 @@ def test_async():
 
 	interface = RedisInterface(host=config['db']['host'], port=config['db']['port'])
 	interface.db.flushdb()
+	interface.updateIndexesList()
 
 	types = {
 		bool: False,

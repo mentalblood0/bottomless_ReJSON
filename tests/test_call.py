@@ -11,6 +11,7 @@ def test_nonexistent_key():
 
 	interface = RedisInterface(host=config['db']['host'], port=config['db']['port'])
 	interface.db.flushdb()
+	interface.updateIndexesList()
 
 	assert interface['key'] == None
 	assert interface['key']() == None
@@ -20,6 +21,7 @@ def test_deep():
 
 	interface = RedisInterface(host=config['db']['host'], port=config['db']['port'])
 	interface.db.flushdb()
+	interface.updateIndexesList()
 
 	interface['1'] = 'one'
 	interface['2'] = 'two'
@@ -43,6 +45,7 @@ def test_change_depth():
 
 	interface = RedisInterface(host=config['db']['host'], port=config['db']['port'])
 	interface.db.flushdb()
+	interface.updateIndexesList()
 
 	interface['key'] = {
 		'a': 1

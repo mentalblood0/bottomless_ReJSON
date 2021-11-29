@@ -9,6 +9,7 @@ def test_append():
 
 	interface = RedisInterface(host=config['db']['host'], port=config['db']['port'])
 	interface.db.flushdb()
+	interface.updateIndexesList()
 
 	interface['key'] = []
 	print('1', interface())

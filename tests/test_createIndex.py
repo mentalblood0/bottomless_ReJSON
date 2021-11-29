@@ -9,6 +9,7 @@ def test_basic():
 
 	interface = RedisInterface(host=config['db']['host'], port=config['db']['port'])
 	interface.db.flushdb()
+	interface.updateIndexesList()
 
 	interface['sessions'] = {
 		'a': {'state': 'new'},
@@ -19,9 +20,6 @@ def test_basic():
 	}
 
 	interface['sessions'].createIndex('state')
-	interface.use_indexes_cache = False
-	interface.use_indexes_cache = True
-	print(interface.indexes())
 
 	assert interface.indexes['sessions']['__index__']['state'] == {
 		'new': {
@@ -36,8 +34,6 @@ def test_basic():
 			'e': True
 		}
 	}
-	interface.use_indexes_cache = False
-	interface.use_indexes_cache = True
 
 	assert interface['sessions'].filter(state='new') == {
 		interface['sessions']['a'],

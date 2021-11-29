@@ -7,3 +7,4 @@ build.sh
 config.json
 db_indexes.json
 db.json
+test.py

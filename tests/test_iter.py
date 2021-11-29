@@ -9,6 +9,7 @@ def test_basic():
 
 	interface = RedisInterface(host=config['db']['host'], port=config['db']['port'])
 	interface.db.flushdb()
+	interface.updateIndexesList()
 
 	interface['key'] = []
 	interface = interface['key']
@@ -27,6 +28,7 @@ def test_valid_key():
 
 	interface = RedisInterface(host=config['db']['host'], port=config['db']['port'])
 	interface.db.flushdb()
+	interface.updateIndexesList()
 
 	sessions = [{
 		f'session {i}': {

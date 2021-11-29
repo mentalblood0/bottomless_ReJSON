@@ -12,6 +12,7 @@ def test_interrupt():
 
 	interface = RedisInterface(host=config['db']['host'], port=config['db']['port'])
 	interface.db.flushdb()
+	interface.updateIndexesList()
 
 	db = interface.db
 
@@ -34,6 +35,7 @@ def test_delete_after_multi():
 
 	interface = RedisInterface(host=config['db']['host'], port=config['db']['port'])
 	interface.db.flushdb()
+	interface.updateIndexesList()
 
 	db = interface.db
 
@@ -53,6 +55,7 @@ def test_update():
 
 	interface = RedisInterface(host=config['db']['host'], port=config['db']['port'])
 	interface.db.flushdb()
+	interface.updateIndexesList()
 
 	results = {'long_set': False, 'long_get': None}
 
@@ -96,6 +99,7 @@ def test_add():
 
 	interface = RedisInterface(host=config['db']['host'], port=config['db']['port'])
 	interface.db.flushdb()
+	interface.updateIndexesList()
 
 	results = {'long_set': 0}
 

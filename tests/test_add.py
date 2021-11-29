@@ -9,6 +9,7 @@ def test_simple():
 
 	interface = RedisInterface(host=config['db']['host'], port=config['db']['port'])
 	interface.db.flushdb()
+	interface.updateIndexesList()
 	interface.clear()
 
 	assert interface['a'] + interface['b'] == interface['a']['b']
@@ -18,6 +19,7 @@ def test_complex():
 
 	interface = RedisInterface(host=config['db']['host'], port=config['db']['port'])
 	interface.db.flushdb()
+	interface.updateIndexesList()
 	interface.clear()
 
 	assert interface['a']['b'] \

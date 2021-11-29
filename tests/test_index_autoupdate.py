@@ -9,10 +9,10 @@ def test_add_simple():
 
 	interface = RedisInterface(host=config['db']['host'], port=config['db']['port'])
 	interface.db.flushdb()
+	interface.updateIndexesList()
 	
 	interface['sessions'].createIndex('state')
-	interface.use_indexes_cache = False
-	interface.use_indexes_cache = True
+	interface.updateIndexesList()
 	
 	interface['sessions']['f'] = {'state': 'new'}
 
@@ -28,12 +28,11 @@ def test_add_complex():
 
 	interface = RedisInterface(host=config['db']['host'], port=config['db']['port'])
 	interface.db.flushdb()
-	interface.use_indexes_cache = False
-	interface.use_indexes_cache = True
+	interface.updateIndexesList()
+	interface.updateIndexesList()
 
 	interface['sessions'].createIndex('state')
-	interface.use_indexes_cache = False
-	interface.use_indexes_cache = True
+	interface.updateIndexesList()
 
 	interface['sessions'] = {
 		'a': {'state': 'new'},
@@ -53,12 +52,11 @@ def test_add_simple_after_complex():
 
 	interface = RedisInterface(host=config['db']['host'], port=config['db']['port'])
 	interface.db.flushdb()
-	interface.use_indexes_cache = False
-	interface.use_indexes_cache = True
+	interface.updateIndexesList()
+	interface.updateIndexesList()
 
 	interface['sessions'].createIndex('state')
-	interface.use_indexes_cache = False
-	interface.use_indexes_cache = True
+	interface.updateIndexesList()
 
 	interface['sessions'] = {
 		'a': {'state': 'new'},
@@ -82,12 +80,11 @@ def test_remove_simple():
 
 	interface = RedisInterface(host=config['db']['host'], port=config['db']['port'])
 	interface.db.flushdb()
-	interface.use_indexes_cache = False
-	interface.use_indexes_cache = True
+	interface.updateIndexesList()
+	interface.updateIndexesList()
 
 	interface['sessions'].createIndex('state')
-	interface.use_indexes_cache = False
-	interface.use_indexes_cache = True
+	interface.updateIndexesList()
 
 	interface['sessions'] = {
 		'a': {'state': 'new'},
@@ -98,7 +95,7 @@ def test_remove_simple():
 	}
 
 	print(interface.indexes())
-	print(interface.getAllIndexes())
+	print(interface.indexes_list)
 	print('del')
 	del interface['sessions']['a']
 
@@ -114,12 +111,11 @@ def test_remove_complex():
 
 	interface = RedisInterface(host=config['db']['host'], port=config['db']['port'])
 	interface.db.flushdb()
-	interface.use_indexes_cache = False
-	interface.use_indexes_cache = True
+	interface.updateIndexesList()
+	interface.updateIndexesList()
 
 	interface['sessions'].createIndex('state')
-	interface.use_indexes_cache = False
-	interface.use_indexes_cache = True
+	interface.updateIndexesList()
 
 	interface['sessions'] = {
 		'a': {'state': 'new'},
@@ -146,12 +142,11 @@ def test_update_value():
 
 	interface = RedisInterface(host=config['db']['host'], port=config['db']['port'])
 	interface.db.flushdb()
-	interface.use_indexes_cache = False
-	interface.use_indexes_cache = True
+	interface.updateIndexesList()
+	interface.updateIndexesList()
 
 	interface['sessions'].createIndex('state')
-	interface.use_indexes_cache = False
-	interface.use_indexes_cache = True
+	interface.updateIndexesList()
 
 	interface['sessions'] = {
 		'a': {'state': 'new'}
@@ -176,12 +171,11 @@ def test_update():
 
 	interface = RedisInterface(host=config['db']['host'], port=config['db']['port'])
 	interface.db.flushdb()
-	interface.use_indexes_cache = False
-	interface.use_indexes_cache = True
+	interface.updateIndexesList()
+	interface.updateIndexesList()
 
 	interface['sessions'].createIndex('state')
-	interface.use_indexes_cache = False
-	interface.use_indexes_cache = True
+	interface.updateIndexesList()
 
 	interface['sessions'] = {
 		'a': {'state': 'new'},
@@ -218,10 +212,10 @@ def test_update_complex():
 
 	interface = RedisInterface(host=config['db']['host'], port=config['db']['port'])
 	interface.db.flushdb()
+	interface.updateIndexesList()
 
 	interface['key']['sessions'].createIndex('state')
-	interface.use_indexes_cache = False
-	interface.use_indexes_cache = True
+	interface.updateIndexesList()
 
 	interface['key']['sessions'] = {
 		'a': {'state': 'new'},
@@ -261,12 +255,12 @@ def test_clear():
 
 	interface = RedisInterface(host=config['db']['host'], port=config['db']['port'])
 	interface.db.flushdb()
+	interface.updateIndexesList()
 
 	assert interface() == None
 
 	interface['sessions'].createIndex('state')
-	interface.use_indexes_cache = False
-	interface.use_indexes_cache = True
+	interface.updateIndexesList()
 
 	interface['sessions'] = {
 		'a': {'state': 'new'},

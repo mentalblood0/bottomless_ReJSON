@@ -9,6 +9,7 @@ def test_basic():
 
 	interface = RedisInterface(host=config['db']['host'], port=config['db']['port'])
 	interface.db.flushdb()
+	interface.updateIndexesList()
 
 	interface |= {
 		'1': {
@@ -35,6 +36,7 @@ def test_not_empty():
 
 	interface = RedisInterface(host=config['db']['host'], port=config['db']['port'])
 	interface.db.flushdb()
+	interface.updateIndexesList()
 
 	interface['key'] = {
 		'a': 1
@@ -60,6 +62,7 @@ def test_not_dict():
 
 	interface = RedisInterface(host=config['db']['host'], port=config['db']['port'])
 	interface.db.flushdb()
+	interface.updateIndexesList()
 
 	key = '1'
 
@@ -85,6 +88,7 @@ def test_deep_dict_shallow_update():
 
 	interface = RedisInterface(host=config['db']['host'], port=config['db']['port'])
 	interface.db.flushdb()
+	interface.updateIndexesList()
 
 	key = 'key'
 	deep = {

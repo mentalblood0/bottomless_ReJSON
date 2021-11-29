@@ -9,6 +9,7 @@ def test_object():
 
 	interface = RedisInterface(host=config['db']['host'], port=config['db']['port'])
 	interface.db.flushdb()
+	interface.updateIndexesList()
 
 	interface |= {
 		'sessions': {
@@ -34,6 +35,7 @@ def test_array():
 
 	interface = RedisInterface(host=config['db']['host'], port=config['db']['port'])
 	interface.db.flushdb()
+	interface.updateIndexesList()
 
 	interface.set([
 		[

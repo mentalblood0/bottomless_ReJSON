@@ -7,37 +7,9 @@ from .common import *
 
 
 
-getAllIndexes__use_cache = True
-getAllIndexes__cache = None
-
-def getAllIndexes(self):
-
-	global getAllIndexes__cache
-
-	if (not getAllIndexes__use_cache) or (getAllIndexes__cache == None):
-
-		result = [self.indexes]
-
-		while True:
-			result = [
-				e 
-				for r in result
-				for e in list(r)
-				if not '__index__' in r.path
-			]
-			if all(['__index__' in e.path for e in result]):
-				break
-		
-		getAllIndexes__cache = [
-			e.path[:-2] + [e.path[-1]]
-			for r in result
-			for e in list(r)
-		]
-	
-	return getAllIndexes__cache
-
-
 class RedisInterface:
+
+	indexes = []
 
 	def __init__(
 		self, 
@@ -80,19 +52,6 @@ class RedisInterface:
 	def db_id(self):
 		return self.db.connection_pool.connection_kwargs['db']
 	
-	@property
-	def use_indexes_cache(self):
-		return getAllIndexes__use_cache
-	
-	@use_indexes_cache.setter
-	def use_indexes_cache(self, value: bool):
-		
-		global getAllIndexes__cache
-		getAllIndexes__cache = None if not value else getAllIndexes(self)
-		
-		global getAllIndexes__use_cache
-		getAllIndexes__use_cache = value
-	
 	@cached_property
 	def parent(self):
 		return None if not self.path else RedisInterface(self.db, self.path[:-1], self.root_key)
@@ -124,11 +83,32 @@ class RedisInterface:
 	def getIndex(self, field):
 		return (self.indexes + self)['__index__'][field]
 	
-	def getAllIndexes(self):
-		return getAllIndexes(self)
+	def updateIndexesList(self):
+
+		result = [self.indexes]
+
+		while True:
+			result = [
+				e 
+				for r in result
+				for e in list(r)
+				if not '__index__' in r.path
+			]
+			if all(['__index__' in e.path for e in result]):
+				break
+		
+		self.__class__.indexes = [
+			e.path[:-2] + [e.path[-1]]
+			for r in result
+			for e in list(r)
+		]
+	
+	@property
+	def indexes_list(self):
+		return self.__class__.indexes
 
 	def isIndexExists(self, field):
-		return (self.path + [field]) in self.getAllIndexes()
+		return (self.path + [field]) in self.indexes_list
 	
 	def addToIndex(self, field, temp=None, value=None):
 		
@@ -164,7 +144,7 @@ class RedisInterface:
 		if not hasattr(self, 'indexes'):
 			return
 
-		for i in self.getAllIndexes():
+		for i in self.indexes_list:
 
 			if self.path == i[:len(self.path)]:
 				index_path = i[:-1] + ['__index__', i[-1]]
@@ -177,7 +157,7 @@ class RedisInterface:
 			path = self.path[:-1]
 			keys_to_delete = []
 			
-			for i in self.getAllIndexes():
+			for i in self.indexes_list:
 			
 				if path == i[:len(path)]:
 			
@@ -193,7 +173,7 @@ class RedisInterface:
 		
 		if len(self.path) > 2:
 			path = self.path[:-2] + [self.path[-1]]
-			for i in self.getAllIndexes():
+			for i in self.indexes_list:
 				if path == i[:len(path)]:
 					index_path = path[:-1] + ['__index__', path[-1]]
 					index = RedisInterface(self.db, index_path, root_key='indexes')
@@ -205,6 +185,10 @@ class RedisInterface:
 		if self.isIndexExists(field):
 			return
 		
+		new_index_signature = self.path + [field]
+		if not new_index_signature in self.__class__.indexes:
+			self.__class__.indexes.append(new_index_signature)
+
 		temp = Calls()
 		
 		self.getIndex(field).set({}, temp)

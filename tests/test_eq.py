@@ -9,6 +9,7 @@ def test_valid_key():
 
 	interface = RedisInterface(host=config['db']['host'], port=config['db']['port'])
 	interface.db.flushdb()
+	interface.updateIndexesList()
 	interface.clear()
 	interface['key'] = 'value'
 
@@ -19,6 +20,7 @@ def test_invalid_key():
 
 	interface = RedisInterface(host=config['db']['host'], port=config['db']['port'])
 	interface.db.flushdb()
+	interface.updateIndexesList()
 	interface.clear()
 	del interface['key']
 

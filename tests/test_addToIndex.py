@@ -9,6 +9,7 @@ def test_basic():
 
 	interface = RedisInterface(host=config['db']['host'], port=config['db']['port'])
 	interface.db.flushdb()
+	interface.updateIndexesList()
 
 	interface['sessions'] = {
 		'a': {'state': 'new'},
@@ -19,8 +20,7 @@ def test_basic():
 	}
 
 	interface.indexes['sessions']['__index__']['state'] = {}
-	interface.use_indexes_cache = False
-	interface.use_indexes_cache = True
+	interface.updateIndexesList()
 	for k in interface['sessions'].keys():
 		interface['sessions'][k].addToIndex('state')
 	

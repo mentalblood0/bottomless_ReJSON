@@ -11,6 +11,7 @@ class without_index(Benchmark):
 
 		self.interface = RedisInterface(host=config['db']['host'], port=config['db']['port'])
 		self.interface.db.flushdb()
+		self.interface.updateIndexesList()
 
 		self.interface['sessions'] = {
 			str(i): {'state': 'new'}
@@ -30,6 +31,8 @@ class with_index(Benchmark):
 
 		self.interface = RedisInterface(host=config['db']['host'], port=config['db']['port'])
 		self.interface.db.flushdb()
+		self.interface.updateIndexesList()
+		
 		self.interface['sessions'].createIndex('state')
 		self.interface.use_indexes_cache = False
 		self.interface.use_indexes_cache = True

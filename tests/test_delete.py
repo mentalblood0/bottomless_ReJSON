@@ -10,6 +10,7 @@ def test_valid_key():
 
 	interface = RedisInterface(host=config['db']['host'], port=config['db']['port'])
 	interface.db.flushdb()
+	interface.updateIndexesList()
 	interface['key'] = 'value'
 
 	del interface['key']
@@ -19,6 +20,7 @@ def test_cascade():
 
 	interface = RedisInterface(host=config['db']['host'], port=config['db']['port'])
 	interface.db.flushdb()
+	interface.updateIndexesList()
 
 	interface['1'] = 'one'
 	interface['2'] = 'two'
@@ -43,6 +45,8 @@ def test_with_indexes():
 
 	interface = RedisInterface(host=config['db']['host'], port=config['db']['port'])
 	interface.db.flushdb()
+	interface.updateIndexesList()
+	interface.updateIndexesList()
 
 	with open('tests/test_delete_db.json') as f:
 		db = json.load(f)
@@ -52,8 +56,7 @@ def test_with_indexes():
 		indexes = json.load(f)
 	interface.indexes.set(indexes)
 	
-	interface.use_indexes_cache = False
-	interface.use_indexes_cache = True
+	interface.updateIndexesList()
 
 	assert interface == db
 	assert interface.indexes == indexes

@@ -11,6 +11,8 @@ class one_index(Benchmark):
 
 		self.interface = RedisInterface(host=config['db']['host'], port=config['db']['port'])
 		self.interface.db.flushdb()
+		self.interface.updateIndexesList()
+		
 		self.interface['sessions'].createIndex('state')
 		self.interface.use_indexes_cache = False
 		self.interface.use_indexes_cache = True
@@ -34,6 +36,7 @@ class n_index(Benchmark):
 
 		self.interface = RedisInterface(host=config['db']['host'], port=config['db']['port'])
 		self.interface.db.flushdb()
+		self.interface.updateIndexesList()
 
 		for i in range(index_number):
 			self.interface['sessions'].createIndex(f"property_{i}")
