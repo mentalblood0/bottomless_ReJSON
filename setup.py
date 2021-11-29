@@ -12,14 +12,15 @@ if __name__ == '__main__':
 
 	setup(
 		name='bottomless_ReJSON',
-		version='0.10',
+		version='0.11',
 		description='Correct Redis Library',
 		long_description=long_description,
 		long_description_content_type='text/markdown',
 		author='mentalblood',
 		install_requires=[
 			'rejson',
-			'flatten_dict'
+			'flatten_dict',
+			'deepmerge'
 		],
 		packages=['bottomless_ReJSON', 'bottomless_ReJSON.calls']
 	)

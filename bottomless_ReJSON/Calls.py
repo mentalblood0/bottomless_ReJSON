@@ -4,8 +4,6 @@ from rejson import Client
 from redis import WatchError
 from flatten_dict import flatten
 from deepmerge import always_merger
-from multiprocessing import cpu_count
-from multiprocessing.pool import ThreadPool
 
 from .calls import *
 from .common import *
@@ -90,17 +88,15 @@ class Calls(list):
 		
 		return result
 	
-	def getPrepared(self, db, threads=cpu_count()//2):
+	def getPrepared(self, db):
 
 		result = []
 
 		for c in self:
 			result.append(c)
 			result.extend(c.getAdditionalCalls(db))
-		
-		mapper = map
 
-		return Calls(mapper(
+		return Calls(map(
 			lambda c: c.getCorrect(db),
 			result
 		)).aggregate()
