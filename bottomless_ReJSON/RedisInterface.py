@@ -217,14 +217,17 @@ class RedisInterface:
 		
 		keys = set()
 		for field, value in kwargs.items():
-			payload = {
-				k
-				for k in self.getIndex(field)[value].keys()
-			}
 			if not keys:
-				keys = payload
+				keys = {
+					k
+					for k in self.getIndex(field)[value].keys()
+				}
 			else:
-				keys &= payload
+				keys = {
+					k
+					for k in keys
+					if self.getIndex(field)[value][k].type != None
+				}
 		
 		return [
 			self[k]
