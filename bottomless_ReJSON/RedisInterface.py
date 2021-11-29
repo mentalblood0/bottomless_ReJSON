@@ -9,7 +9,7 @@ from .common import *
 
 class RedisInterface:
 
-	indexes = []
+	indexes = {}
 
 	def __init__(
 		self, 
@@ -83,6 +83,10 @@ class RedisInterface:
 	def getIndex(self, field):
 		return (self.indexes + self)['__index__'][field]
 	
+	@cached_property
+	def _indexes_list_key(self):
+		return f"{self.host}:{self.port}:{self.db_id}"
+	
 	def updateIndexesList(self):
 
 		result = [self.indexes]
@@ -97,7 +101,7 @@ class RedisInterface:
 			if all(['__index__' in e.path for e in result]):
 				break
 		
-		self.__class__.indexes = [
+		self.indexes_list = [
 			e.path[:-2] + [e.path[-1]]
 			for r in result
 			for e in list(r)
@@ -105,7 +109,11 @@ class RedisInterface:
 	
 	@property
 	def indexes_list(self):
-		return self.__class__.indexes
+		return self.__class__.indexes[self._indexes_list_key]
+	
+	@indexes_list.setter
+	def indexes_list(self, value):
+		self.__class__.indexes[self._indexes_list_key] = value
 
 	def isIndexExists(self, field):
 		return (self.path + [field]) in self.indexes_list
@@ -186,8 +194,8 @@ class RedisInterface:
 			return
 		
 		new_index_signature = self.path + [field]
-		if not new_index_signature in self.__class__.indexes:
-			self.__class__.indexes.append(new_index_signature)
+		if not new_index_signature in self.indexes_list:
+			self.indexes_list.append(new_index_signature)
 
 		temp = Calls()
 		
