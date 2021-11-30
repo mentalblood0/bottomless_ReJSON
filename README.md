@@ -1,10 +1,12 @@
-# ⚿ bottomless_ReJSON 
+# <span style="color:gold">⚿</span> bottomless_ReJSON 
 
-Library for seamless Redis database management. This version uses RedisJSON module
+Library for seamless Redis database management. This version uses [RedisJSON](https://oss.redis.com/redisjson/) module
 
 <br/>
 
 * 💤 No excess data reading/rewriting
+* 🗃 Integrated indexes support
+* ⛓ Thread-safe operations
 * 👁️ One-class interface
 * 🪄 A lot of sugar
 
@@ -29,7 +31,7 @@ Feel free to use the tests as a manual
 ```python
 import bottomless_ReJSON.RedisInterface as RedisInterface
 
-db = RedisInterface("redis://localhost:6379") # just like redis.from_url
+db = RedisInterface(host='localhost', port='6379')
 ```
 
 ### Dictionary-like interface
@@ -86,3 +88,15 @@ git clone https://github.com/MentalBlood/bottomless_ReJSON
 cd bottomless_ReJSON
 pytest tests
 ```
+
+<br/>
+
+## 📈 Benchmarking
+
+Using [sharpener](https://github.com/MentalBlood/sharpener):
+```bash
+git clone https://github.com/MentalBlood/bottomless_ReJSON
+cd bottomless_ReJSON
+py -m sharpener run
+```
+Config for benchmarks can be found in `benchmarks/benchmark_default.json`
