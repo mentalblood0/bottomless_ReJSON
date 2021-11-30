@@ -4,7 +4,7 @@ from datetime import datetime
 from threading import Thread
 
 from tests import config
-import bottomless_ReJSON.RedisInterface as RedisInterface
+from bottomless_ReJSON import RedisInterface
 
 
 

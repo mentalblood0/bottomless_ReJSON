@@ -1,7 +1,7 @@
 import json
 
 from tests import config
-import bottomless_ReJSON.RedisInterface as RedisInterface
+from bottomless_ReJSON import RedisInterface
 
 
 

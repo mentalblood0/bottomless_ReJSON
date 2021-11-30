@@ -29,7 +29,7 @@ Feel free to use the tests as a manual
 ### Preparations
 
 ```python
-import bottomless_ReJSON.RedisInterface as RedisInterface
+from bottomless_ReJSON import RedisInterface
 
 db = RedisInterface(host='localhost', port='6379')
 ```
