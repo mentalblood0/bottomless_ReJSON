@@ -10,15 +10,9 @@ class RedisInterface:
 
     indexes = {}
 
-    def __init__(
-        self, db=None, path=[], root_key="root", host=None, port=None, indexes=None
-    ):
+    def __init__(self, db=None, path=[], root_key="root", host=None, port=None, indexes=None):
 
-        self.__db = (
-            db
-            if isinstance(db, Client)
-            else Client(host=host, port=port, decode_responses=True)
-        )
+        self.__db = db if isinstance(db, Client) else Client(host=host, port=port, decode_responses=True)
         self.__path = path
         self.__root_key = root_key
 
@@ -51,11 +45,7 @@ class RedisInterface:
 
     @cached_property
     def parent(self):
-        return (
-            None
-            if not self.path
-            else RedisInterface(self.db, self.path[:-1], self.root_key)
-        )
+        return None if not self.path else RedisInterface(self.db, self.path[:-1], self.root_key)
 
     @cached_property
     def _path(self):
@@ -97,9 +87,7 @@ class RedisInterface:
             if all(["__index__" in e.path for e in result]):
                 break
 
-        self.indexes_list = [
-            e.path[:-2] + [e.path[-1]] for r in result for e in list(r)
-        ]
+        self.indexes_list = [e.path[:-2] + [e.path[-1]] for r in result for e in list(r)]
 
     @property
     def indexes_list(self):
@@ -211,9 +199,7 @@ class RedisInterface:
 
         field_with_min_elements, value_with_min_elements = min(
             kwargs.items(),
-            key=lambda item: (lambda field, value: len(self.getIndex(field)[value]))(
-                *item
-            ),
+            key=lambda item: (lambda field, value: len(self.getIndex(field)[value]))(*item),
             default=(None, None),
         )
         if not field_with_min_elements:
@@ -262,9 +248,7 @@ class RedisInterface:
     def __eq__(self, other):
 
         if isinstance(other, RedisInterface):
-            return (
-                (self.root_key == other.root_key) and (self.path == other.path)
-            ) or (self() == other())
+            return ((self.root_key == other.root_key) and (self.path == other.path)) or (self() == other())
         else:
             return self() == other
 
@@ -337,9 +321,4 @@ class RedisInterface:
         return True
 
     def __hash__(self):
-        return hash(
-            (
-                str(e)
-                for e in [self.host, self.port, self.db_id, self.root_key, self.path]
-            )
-        )
+        return hash((str(e) for e in [self.host, self.port, self.db_id, self.root_key, self.path]))

@@ -26,14 +26,10 @@ def aggregate(calls, method_name):
             if not key in joined[root_key]:
                 joined[root_key][key] = value
             else:
-                joined[root_key][key] = always_merger.merge(
-                    joined[root_key][key], value
-                )
+                joined[root_key][key] = always_merger.merge(joined[root_key][key], value)
 
         aggregated = [
-            SetCall((method_name, (r, json.loads(k) if k else [], v)))
-            for r in joined
-            for k, v in joined[r].items()
+            SetCall((method_name, (r, json.loads(k) if k else [], v))) for r in joined for k, v in joined[r].items()
         ]
 
         return aggregated
@@ -59,10 +55,7 @@ def aggregate(calls, method_name):
                         current[p] = {}
                     current = current[p]
 
-        result += [
-            DeleteCall((method_name, (root_key, list(path))))
-            for path in flatten(joined)
-        ]
+        result += [DeleteCall((method_name, (root_key, list(path)))) for path in flatten(joined)]
 
         return result
 
@@ -123,9 +116,7 @@ class Calls(list):
 
                 if len(prepared_calls):
 
-                    id_keys = [
-                        f"transaction_{c.root_key}{c.path}" for c in prepared_calls
-                    ]
+                    id_keys = [f"transaction_{c.root_key}{c.path}" for c in prepared_calls]
 
                     pipe = db.pipeline()
                     pipe.watch(*id_keys)

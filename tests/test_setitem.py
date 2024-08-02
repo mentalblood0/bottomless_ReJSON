@@ -49,10 +49,7 @@ def test_complex_arrays():
 
     interface = RedisInterface(host=config["db"]["host"], port=config["db"]["port"])
     interface.clear()
-    interface["sessions"]["__index__"]["state"]["new"] = [
-        ["sessions", "a"],
-        ["sessions", "c"],
-    ]
+    interface["sessions"]["__index__"]["state"]["new"] = [["sessions", "a"], ["sessions", "c"]]
 
 
 def test_complex_indexes_arrays():
@@ -67,10 +64,7 @@ def test_complex_indexes_arrays():
         "e": {"state": "erroneous"},
     }
 
-    interface.indexes["sessions"]["__index__"]["state"]["new"] = [
-        ["sessions", "a"],
-        ["sessions", "c"],
-    ]
+    interface.indexes["sessions"]["__index__"]["state"]["new"] = [["sessions", "a"], ["sessions", "c"]]
 
 
 def test_many_complex():
@@ -124,10 +118,7 @@ def test_async():
     keys_number = 1
 
     setters = {
-        key: {
-            t: Thread(target=repeat_set(t), args=[interface, key, seconds, report])
-            for t in types
-        }
+        key: {t: Thread(target=repeat_set(t), args=[interface, key, seconds, report]) for t in types}
         for key in range(keys_number)
     }
 

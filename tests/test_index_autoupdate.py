@@ -30,10 +30,7 @@ def test_add_complex():
         "e": {"state": "erroneous"},
     }
 
-    assert interface["sessions"].filter(state="new") == {
-        interface["sessions"]["a"],
-        interface["sessions"]["c"],
-    }
+    assert interface["sessions"].filter(state="new") == {interface["sessions"]["a"], interface["sessions"]["c"]}
 
 
 def test_add_simple_after_complex():
@@ -117,16 +114,12 @@ def test_update_value():
 
     interface["sessions"]["a"]["state"] = "processed"
     assert interface["sessions"].filter(state="new") == set()
-    assert interface["sessions"].filter(state="processed") == {
-        interface["sessions"]["a"]
-    }
+    assert interface["sessions"].filter(state="processed") == {interface["sessions"]["a"]}
 
     interface["sessions"]["a"]["state"] = "finished"
     assert interface["sessions"].filter(state="new") == set()
     assert interface["sessions"].filter(state="processed") == set()
-    assert interface["sessions"].filter(state="finished") == {
-        interface["sessions"]["a"]
-    }
+    assert interface["sessions"].filter(state="finished") == {interface["sessions"]["a"]}
 
 
 def test_update():
@@ -151,21 +144,12 @@ def test_update():
     }
 
     assert interface.indexes["sessions"]["__index__"]["state"]["new"]["a"]() == None
-    assert (
-        interface.indexes["sessions"]["__index__"]["state"]["processed"]["d"]() == None
-    )
+    assert interface.indexes["sessions"]["__index__"]["state"]["processed"]["d"]() == None
     assert interface.indexes["sessions"]["__index__"]["state"]["new"]["f"]() == True
 
-    assert interface["sessions"].filter(state="new") == {
-        interface["sessions"]["c"],
-        interface["sessions"]["f"],
-    }
-    assert interface["sessions"].filter(state="processed") == {
-        interface["sessions"]["b"]
-    }
-    assert interface["sessions"].filter(state="erroneous") == {
-        interface["sessions"]["e"]
-    }
+    assert interface["sessions"].filter(state="new") == {interface["sessions"]["c"], interface["sessions"]["f"]}
+    assert interface["sessions"].filter(state="processed") == {interface["sessions"]["b"]}
+    assert interface["sessions"].filter(state="erroneous") == {interface["sessions"]["e"]}
 
 
 def test_update_complex():
@@ -191,26 +175,15 @@ def test_update_complex():
         }
     }
 
-    assert (
-        interface.indexes["key"]["sessions"]["__index__"]["state"]["new"]["a"]() == None
-    )
-    assert (
-        interface.indexes["key"]["sessions"]["__index__"]["state"]["processed"]["d"]()
-        == None
-    )
-    assert (
-        interface.indexes["key"]["sessions"]["__index__"]["state"]["new"]["f"]() == True
-    )
+    assert interface.indexes["key"]["sessions"]["__index__"]["state"]["new"]["a"]() == None
+    assert interface.indexes["key"]["sessions"]["__index__"]["state"]["processed"]["d"]() == None
+    assert interface.indexes["key"]["sessions"]["__index__"]["state"]["new"]["f"]() == True
     assert interface["key"]["sessions"].filter(state="new") == {
         interface["key"]["sessions"]["c"],
         interface["key"]["sessions"]["f"],
     }
-    assert interface["key"]["sessions"].filter(state="processed") == {
-        interface["key"]["sessions"]["b"]
-    }
-    assert interface["key"]["sessions"].filter(state="erroneous") == {
-        interface["key"]["sessions"]["e"]
-    }
+    assert interface["key"]["sessions"].filter(state="processed") == {interface["key"]["sessions"]["b"]}
+    assert interface["key"]["sessions"].filter(state="erroneous") == {interface["key"]["sessions"]["e"]}
 
 
 def test_clear():

@@ -23,16 +23,8 @@ def test_basic():
         "erroneous": {"e": True},
     }
 
-    assert interface["sessions"].filter(state="new") == {
-        interface["sessions"]["a"],
-        interface["sessions"]["c"],
-    }
+    assert interface["sessions"].filter(state="new") == {interface["sessions"]["a"], interface["sessions"]["c"]}
 
-    assert interface["sessions"].filter(state="processed") == {
-        interface["sessions"]["b"],
-        interface["sessions"]["d"],
-    }
+    assert interface["sessions"].filter(state="processed") == {interface["sessions"]["b"], interface["sessions"]["d"]}
 
-    assert interface["sessions"].filter(state="erroneous") == {
-        interface["sessions"]["e"]
-    }
+    assert interface["sessions"].filter(state="erroneous") == {interface["sessions"]["e"]}

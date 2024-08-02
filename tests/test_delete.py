@@ -54,9 +54,7 @@ def test_with_indexes():
     assert interface == db
     assert interface.indexes == indexes
     sessions_ids = set(interface["sessions"].keys())
-    sessions_ids_in_index = set(
-        interface.indexes["sessions"]["__index__"]["state"]["finished"].keys()
-    )
+    sessions_ids_in_index = set(interface.indexes["sessions"]["__index__"]["state"]["finished"].keys())
     assert sessions_ids == sessions_ids_in_index
 
     interface.clear()

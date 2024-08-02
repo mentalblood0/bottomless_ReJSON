@@ -24,19 +24,11 @@ def test_with_index():
     }
     interface.updateIndexesList()
 
-    assert interface["sessions"].filter(state="new") == {
-        interface["sessions"]["a"],
-        interface["sessions"]["c"],
-    }
+    assert interface["sessions"].filter(state="new") == {interface["sessions"]["a"], interface["sessions"]["c"]}
 
-    assert interface["sessions"].filter(state="processed") == {
-        interface["sessions"]["b"],
-        interface["sessions"]["d"],
-    }
+    assert interface["sessions"].filter(state="processed") == {interface["sessions"]["b"], interface["sessions"]["d"]}
 
-    assert interface["sessions"].filter(state="erroneous") == {
-        interface["sessions"]["e"]
-    }
+    assert interface["sessions"].filter(state="erroneous") == {interface["sessions"]["e"]}
 
 
 def test_without_index():
@@ -80,13 +72,10 @@ def test_n_index():
         interface["sessions"].createIndex(f"property_{i}")
 
     interface["sessions"] = {
-        str(j): {f"property_{i}": bool(j) for i in range(index_number)}
-        for j in range(items_number)
+        str(j): {f"property_{i}": bool(j) for i in range(index_number)} for j in range(items_number)
     }
     interface["sessions"][str(items_number // 2)]["state"] = "new"
 
-    result = interface["sessions"].filter(
-        **{f"property_{i}": False for i in range(index_number)}
-    )
+    result = interface["sessions"].filter(**{f"property_{i}": False for i in range(index_number)})
 
     assert result == {interface["sessions"]["0"]}

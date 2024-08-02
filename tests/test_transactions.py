@@ -98,10 +98,7 @@ def test_add():
         "commandCount": 0,
     }
 
-    setters = [
-        Thread(target=long_set, args=[interface["sessions"][str(i)], value])
-        for i in range(n)
-    ]
+    setters = [Thread(target=long_set, args=[interface["sessions"][str(i)], value]) for i in range(n)]
 
     for s in setters:
         s.start()
