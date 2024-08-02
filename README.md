@@ -1,14 +1,14 @@
-# <span style="color:gold">⚿</span> bottomless_ReJSON 
+# <span style="color:gold">⚿</span> bottomless_ReJSON
 
 Library for seamless Redis database management. This version uses [RedisJSON](https://oss.redis.com/redisjson/) module
 
 <br/>
 
-* 💤 No excess data reading/rewriting
-* 🗃 Integrated indexes support
-* ⛓ Thread-safe operations
-* 👁️ One-class interface
-* 🪄 A lot of sugar
+- 💤 No excess data reading/rewriting
+- 🗃 Integrated indexes support
+- ⛓ Thread-safe operations
+- 👁️ One-class interface
+- 🪄 A lot of sugar
 
 <br/>
 
@@ -70,7 +70,7 @@ db += [1, 2, 3]
 
 i = 0
 for e in db:
-    # e is RedisInterface instance, 
+    # e is RedisInterface instance,
     # so to get data you need to call it:
     assert e() == l[i]
     assert e() == db[i]
@@ -84,7 +84,7 @@ for e in db:
 ## 🔬 Testing
 
 ```bash
-git clone https://github.com/MentalBlood/bottomless_ReJSON
+git clone https://codeberg.org/mentalblood/bottomless_ReJSON
 cd bottomless_ReJSON
 pytest tests
 ```
@@ -93,10 +93,13 @@ pytest tests
 
 ## 📈 Benchmarking
 
-Using [sharpener](https://github.com/MentalBlood/sharpener):
+Using [sharpener](https://codeberg.org/mentalblood/sharpener):
+
 ```bash
-git clone https://github.com/MentalBlood/bottomless_ReJSON
+git clone https://codeberg.org/mentalblood/bottomless_ReJSON
 cd bottomless_ReJSON
 py -m sharpener run
 ```
+
 Config for benchmarks can be found in `benchmarks/benchmark_default.json`
+
