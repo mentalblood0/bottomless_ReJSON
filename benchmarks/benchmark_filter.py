@@ -4,58 +4,57 @@ from tests import config
 from bottomless_ReJSON import RedisInterface
 
 
-
 class one_index(Benchmark):
 
-	def prepare(self, items_number):
+    def prepare(self, items_number):
 
-		self.interface = RedisInterface(host=config['db']['host'], port=config['db']['port'])
-		self.interface.clear()
-		self.interface.updateIndexesList()
-		
-		self.interface['sessions'].createIndex('state')
-		self.interface.use_indexes_cache = False
-		self.interface.use_indexes_cache = True
+        self.interface = RedisInterface(
+            host=config["db"]["host"], port=config["db"]["port"]
+        )
+        self.interface.clear()
+        self.interface.updateIndexesList()
 
-		self.interface['sessions'] = {
-			str(i): {'state': 'finished'}
-			for i in range(items_number)
-		}
-		self.interface['sessions'][str(items_number // 2)]['state'] = 'new'
+        self.interface["sessions"].createIndex("state")
+        self.interface.use_indexes_cache = False
+        self.interface.use_indexes_cache = True
 
-	def run(self, **kwargs):
-		self.interface['sessions'].filter(state='new')
-	
-	def clean(self, **kwargs):
-		self.interface.clear()
+        self.interface["sessions"] = {
+            str(i): {"state": "finished"} for i in range(items_number)
+        }
+        self.interface["sessions"][str(items_number // 2)]["state"] = "new"
+
+    def run(self, **kwargs):
+        self.interface["sessions"].filter(state="new")
+
+    def clean(self, **kwargs):
+        self.interface.clear()
+
 
 class n_index(Benchmark):
 
-	def prepare(self, items_number, index_number):
+    def prepare(self, items_number, index_number):
 
-		self.interface = RedisInterface(host=config['db']['host'], port=config['db']['port'])
-		self.interface.clear()
-		self.interface.updateIndexesList()
+        self.interface = RedisInterface(
+            host=config["db"]["host"], port=config["db"]["port"]
+        )
+        self.interface.clear()
+        self.interface.updateIndexesList()
 
-		for i in range(index_number):
-			self.interface['sessions'].createIndex(f"property_{i}")
-		self.interface.use_indexes_cache = False
-		self.interface.use_indexes_cache = True
+        for i in range(index_number):
+            self.interface["sessions"].createIndex(f"property_{i}")
+        self.interface.use_indexes_cache = False
+        self.interface.use_indexes_cache = True
 
-		self.interface['sessions'] = {
-			str(j): {
-				f"property_{i}": bool(j)
-				for i in range(index_number)
-			}
-			for j in range(items_number)
-		}
-		self.interface['sessions'][str(items_number // 2)]['state'] = 'new'
+        self.interface["sessions"] = {
+            str(j): {f"property_{i}": bool(j) for i in range(index_number)}
+            for j in range(items_number)
+        }
+        self.interface["sessions"][str(items_number // 2)]["state"] = "new"
 
-	def run(self, index_number, **kwargs):
-		self.interface['sessions'].filter(**{
-			f"property_{i}": True
-			for i in range(index_number)
-		})
-	
-	def clean(self, **kwargs):
-		self.interface.clear()
+    def run(self, index_number, **kwargs):
+        self.interface["sessions"].filter(
+            **{f"property_{i}": True for i in range(index_number)}
+        )
+
+    def clean(self, **kwargs):
+        self.interface.clear()

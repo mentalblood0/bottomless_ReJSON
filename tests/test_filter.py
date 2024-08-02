@@ -4,105 +4,89 @@ from tests import config
 from bottomless_ReJSON import RedisInterface
 
 
-
 def test_with_index():
 
-	interface = RedisInterface(host=config['db']['host'], port=config['db']['port'])
-	interface.clear()
+    interface = RedisInterface(host=config["db"]["host"], port=config["db"]["port"])
+    interface.clear()
 
-	interface['sessions'] = {
-		'a': {'state': 'new'},
-		'b': {'state': 'processed'},
-		'c': {'state': 'new'},
-		'd': {'state': 'processed'},
-		'e': {'state': 'erroneous'}
-	}
+    interface["sessions"] = {
+        "a": {"state": "new"},
+        "b": {"state": "processed"},
+        "c": {"state": "new"},
+        "d": {"state": "processed"},
+        "e": {"state": "erroneous"},
+    }
 
-	interface.indexes['sessions']['__index__']['state'] = {
-		'new': {
-			'a': True,
-			'c': True
-		},
-		'processed': {
-			'b': True,
-			'd': True
-		},
-		'erroneous': {
-			'e': True
-		}
-	}
-	interface.updateIndexesList()
+    interface.indexes["sessions"]["__index__"]["state"] = {
+        "new": {"a": True, "c": True},
+        "processed": {"b": True, "d": True},
+        "erroneous": {"e": True},
+    }
+    interface.updateIndexesList()
 
-	assert interface['sessions'].filter(state='new') == {
-		interface['sessions']['a'],
-		interface['sessions']['c']
-	}
+    assert interface["sessions"].filter(state="new") == {
+        interface["sessions"]["a"],
+        interface["sessions"]["c"],
+    }
 
-	assert interface['sessions'].filter(state='processed') == {
-		interface['sessions']['b'],
-		interface['sessions']['d']
-	}
+    assert interface["sessions"].filter(state="processed") == {
+        interface["sessions"]["b"],
+        interface["sessions"]["d"],
+    }
 
-	assert interface['sessions'].filter(state='erroneous') == {
-		interface['sessions']['e']
-	}
+    assert interface["sessions"].filter(state="erroneous") == {
+        interface["sessions"]["e"]
+    }
 
 
 def test_without_index():
 
-	interface = RedisInterface(host=config['db']['host'], port=config['db']['port'])
-	interface.clear()
-	interface['sessions'] = {
-		'a': {'state': 'new'},
-		'b': {'state': 'processed'},
-		'c': {'state': 'new'},
-		'd': {'state': 'processed'},
-		'e': {'state': 'erroneous'}
-	}
+    interface = RedisInterface(host=config["db"]["host"], port=config["db"]["port"])
+    interface.clear()
+    interface["sessions"] = {
+        "a": {"state": "new"},
+        "b": {"state": "processed"},
+        "c": {"state": "new"},
+        "d": {"state": "processed"},
+        "e": {"state": "erroneous"},
+    }
 
-	assert interface.indexes == None
+    assert interface.indexes == None
 
-	for state_value in ['new', 'processed', 'erroneous']:
-		with pytest.raises(NotImplementedError):
-			interface['sessions'].filter(state=state_value)
+    for state_value in ["new", "processed", "erroneous"]:
+        with pytest.raises(NotImplementedError):
+            interface["sessions"].filter(state=state_value)
 
 
 def test_change_value():
 
-	items_number = 10
+    items_number = 10
 
-	interface = RedisInterface(host=config['db']['host'], port=config['db']['port'])
-	interface.clear()
+    interface = RedisInterface(host=config["db"]["host"], port=config["db"]["port"])
+    interface.clear()
 
-	interface['sessions'] = {
-		str(i): {'state': 'finished'}
-		for i in range(items_number)
-	}
-	interface['sessions'][str(items_number // 2)]['state'] = 'new'
+    interface["sessions"] = {str(i): {"state": "finished"} for i in range(items_number)}
+    interface["sessions"][str(items_number // 2)]["state"] = "new"
 
 
 def test_n_index():
 
-	items_number = 10
-	index_number = 10
+    items_number = 10
+    index_number = 10
 
-	interface = RedisInterface(host=config['db']['host'], port=config['db']['port'])
-	interface.clear()
-	for i in range(index_number):
-		interface['sessions'].createIndex(f"property_{i}")
+    interface = RedisInterface(host=config["db"]["host"], port=config["db"]["port"])
+    interface.clear()
+    for i in range(index_number):
+        interface["sessions"].createIndex(f"property_{i}")
 
-	interface['sessions'] = {
-		str(j): {
-			f"property_{i}": bool(j)
-			for i in range(index_number)
-		}
-		for j in range(items_number)
-	}
-	interface['sessions'][str(items_number // 2)]['state'] = 'new'
+    interface["sessions"] = {
+        str(j): {f"property_{i}": bool(j) for i in range(index_number)}
+        for j in range(items_number)
+    }
+    interface["sessions"][str(items_number // 2)]["state"] = "new"
 
-	result = interface['sessions'].filter(**{
-		f"property_{i}": False
-		for i in range(index_number)
-	})
+    result = interface["sessions"].filter(
+        **{f"property_{i}": False for i in range(index_number)}
+    )
 
-	assert result == {interface['sessions']['0']}
+    assert result == {interface["sessions"]["0"]}

@@ -1,4 +1,1 @@
-__all__ = [
-    'SetCall',
-    'DeleteCall'
-]
+__all__ = ["SetCall", "DeleteCall"]
